@@ -3,6 +3,7 @@
 import { useTheme } from "@/context/theme-context";
 import { ThemeColors } from "@/lib/theme-types";
 import { StatCards } from "./stat-cards";
+import { ChartCard } from "./chart-card";
 
 function buildCssVariables(colors: ThemeColors, radius: string): React.CSSProperties {
   const vars: Record<string, string> = { "--radius": radius };
@@ -28,7 +29,14 @@ export function DashboardPreview() {
     >
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         <StatCards />
-        {/* More sections will be added in later tasks */}
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+          <div className="lg:col-span-4">
+            <ChartCard />
+          </div>
+          <div className="lg:col-span-3">
+            {/* Recent sales will go here */}
+          </div>
+        </div>
       </div>
     </div>
   );
