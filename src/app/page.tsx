@@ -2,6 +2,7 @@
 
 import { TopBar } from "@/components/top-bar";
 import { ColorEditor } from "@/components/color-editor";
+import { DashboardPreview } from "@/components/preview/dashboard-preview";
 
 export default function Home() {
   return (
@@ -9,9 +10,7 @@ export default function Home() {
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
         <ColorEditor />
-        <div className="flex-1 p-4 overflow-y-auto">
-          <p className="text-muted-foreground">Preview will go here</p>
-        </div>
+        <DashboardPreview />
       </div>
     </div>
   );
