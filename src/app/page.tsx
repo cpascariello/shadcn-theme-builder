@@ -1,14 +1,17 @@
 "use client";
 
 import { TopBar } from "@/components/top-bar";
+import { ColorEditor } from "@/components/color-editor";
 
 export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
-        <div className="p-4">Color editor will go here</div>
-        <div className="flex-1 p-4">Preview will go here</div>
+        <ColorEditor />
+        <div className="flex-1 p-4 overflow-y-auto">
+          <p className="text-muted-foreground">Preview will go here</p>
+        </div>
       </div>
     </div>
   );
