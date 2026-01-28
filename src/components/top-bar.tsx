@@ -4,6 +4,7 @@ import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import { presets } from "@/lib/presets";
 import { Button } from "@/components/ui/button";
+import { ExportDialog } from "@/components/export-dialog";
 import {
   Select,
   SelectContent,
@@ -52,7 +53,7 @@ export function TopBar() {
           )}
         </Button>
 
-        <Button variant="default">Export</Button>
+        <ExportDialog />
       </div>
     </div>
   );
