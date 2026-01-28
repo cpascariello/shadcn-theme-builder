@@ -6,6 +6,7 @@ import { StatCards } from "./stat-cards";
 import { ChartCard } from "./chart-card";
 import { RecentSales } from "./recent-sales";
 import { DataTableCard } from "./data-table-card";
+import { ComponentShowcase } from "./component-showcase";
 
 function buildCssVariables(colors: ThemeColors, radius: string): React.CSSProperties {
   const vars: Record<string, string> = { "--radius": radius };
@@ -40,6 +41,7 @@ export function DashboardPreview() {
           </div>
         </div>
         <DataTableCard />
+        <ComponentShowcase />
       </div>
     </div>
   );
