@@ -40,6 +40,7 @@ export function DashboardPreview() {
   const { previewMode, light, dark, radius, fonts, shadow } = useTheme();
   const colors = previewMode === "light" ? light : dark;
   const cssVars = buildCssVariables(colors, radius, fonts, shadow);
+  const shadowValue = buildShadowValue(shadow);
 
   return (
     <div
@@ -51,7 +52,16 @@ export function DashboardPreview() {
         fontFamily: "var(--font-sans)",
       }}
     >
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
+      {/* Override shadow classes within preview scope */}
+      <style>{`
+        .preview-scope [class*="shadow"] {
+          box-shadow: ${shadowValue} !important;
+        }
+        .preview-scope .shadow-none {
+          box-shadow: none !important;
+        }
+      `}</style>
+      <div className="preview-scope p-6 max-w-5xl mx-auto space-y-6">
         <StatCards />
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
           <div className="lg:col-span-4">
