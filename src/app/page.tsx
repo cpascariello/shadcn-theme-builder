@@ -28,6 +28,23 @@ function buildCssVariables(
   return vars as React.CSSProperties;
 }
 
+function buildGlobalCssOverride(
+  colors: ThemeColors,
+  radius: string,
+  fonts: FontConfig,
+): string {
+  let css = ":root {\n";
+  css += `  --radius: ${radius};\n`;
+  css += `  --font-sans: ${getFontStack(fonts.sans, "sans")};\n`;
+  css += `  --font-serif: ${getFontStack(fonts.serif, "serif")};\n`;
+  css += `  --font-mono: ${getFontStack(fonts.mono, "mono")};\n`;
+  for (const [key, value] of Object.entries(colors)) {
+    css += `  --${key}: ${value};\n`;
+  }
+  css += "}";
+  return css;
+}
+
 export default function Home() {
   const { previewMode, light, dark, radius, fonts, shadow } = useTheme();
   const colors = previewMode === "light" ? light : dark;
@@ -44,6 +61,8 @@ export default function Home() {
         fontFamily: "var(--font-sans)",
       }}
     >
+      {/* Apply theme variables to :root so portaled content (dropdowns, dialogs) inherits them */}
+      <style>{buildGlobalCssOverride(colors, radius, fonts)}</style>
       {/* Global shadow override */}
       <style>{`
         .themed-shadow {

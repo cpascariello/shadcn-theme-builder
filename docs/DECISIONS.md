@@ -18,6 +18,36 @@ Each entry includes:
 
 ---
 
+## Decision #9 - 2026-01-29
+**Context:** Shadow reset needed to remember which theme was loaded
+**Decision:** Track `loadedTheme` separately from `activePreset`
+**Rationale:** `activePreset` gets set to "custom" on any tweak (color, font, shadow, radius). Reset needs to know the original theme (e.g., "Green") to restore its shadow config. A separate `loadedTheme` state preserves this across customizations.
+**Alternatives considered:** Using a ref (wouldn't trigger re-render of resetShadow callback)
+
+## Decision #8 - 2026-01-29
+**Context:** Shadow color management across light/dark mode
+**Decision:** Mode-aware shadow colors with opt-out for theme-specific colors
+**Rationale:** Neutral shadow presets auto-swap between light (`oklch(0.2 0 0)`) and dark (`oklch(0.9 0 0)`) on mode change. Themes with custom shadow colors (e.g., Bubblegum pink) keep their color. Shadow preset changes only modify geometry, never color.
+**Alternatives considered:** Always auto-swap (breaks themed colors), Never auto-swap (dark shadows invisible on dark mode)
+
+## Decision #7 - 2026-01-29
+**Context:** Radix UI portaled content (dropdowns, dialogs) not inheriting theme
+**Decision:** Inject theme CSS variables into `:root` via global `<style>` tag
+**Rationale:** Radix portals content to `document.body`, outside the themed wrapper div. Inline styles on the wrapper don't cascade to portaled elements. A `<style>` targeting `:root` ensures all portaled UI inherits theme variables.
+**Alternatives considered:** Radix Portal container prop (limited support), CSS-in-JS (unnecessary complexity)
+
+## Decision #6 - 2026-01-29
+**Context:** Preview components had forced equal row heights in CSS Grid
+**Decision:** CSS `columns` layout for masonry-like packing
+**Rationale:** CSS Grid forces rows to match the tallest item's height, creating large gaps. CSS `columns` with `break-inside-avoid` lets each card take its natural height, producing a dense masonry layout without JavaScript.
+**Alternatives considered:** CSS Grid with row-span (gaps persist), Flex columns (unbalanced), Masonry JS library (overkill)
+
+## Decision #5 - 2026-01-29
+**Context:** Preview pane redesign — layout and component count
+**Decision:** 20 preview components in two sections: 4-column masonry (14 components) + 2-column masonry (6 components)
+**Rationale:** More components showcase a wider range of shadcn/ui primitives (Card, Table, Avatar, Badge, Progress, Switch, Accordion, etc.). Two sections with different column counts add visual variety. Inspired by ui.jln.dev and tinte.dev.
+**Alternatives considered:** 4-column CSS Grid (equal height issues), 3-column flex (unbalanced), Single masonry section (too uniform)
+
 ## Decision #4 - 2026-01-29
 **Context:** Layout - header scrolling with content
 **Decision:** Fixed header, independently scrollable left/right panes

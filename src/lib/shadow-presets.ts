@@ -1,8 +1,17 @@
 import type { ShadowConfig, ShadowPreset } from "./theme-types";
 
+// Shadow colors adapt to light/dark mode
+export const SHADOW_COLOR_LIGHT = "oklch(0.2 0 0)";
+export const SHADOW_COLOR_DARK = "oklch(0.9 0 0)";
+
+export function getShadowColor(mode: "light" | "dark"): string {
+  return mode === "light" ? SHADOW_COLOR_LIGHT : SHADOW_COLOR_DARK;
+}
+
+// Preset geometry — color is applied dynamically based on mode
 export const SHADOW_PRESETS: Record<Exclude<ShadowPreset, "custom">, ShadowConfig> = {
   none: {
-    color: "oklch(0 0 0)",
+    color: SHADOW_COLOR_LIGHT,
     offsetX: 0,
     offsetY: 0,
     blur: 0,
@@ -10,7 +19,7 @@ export const SHADOW_PRESETS: Record<Exclude<ShadowPreset, "custom">, ShadowConfi
     opacity: 0,
   },
   subtle: {
-    color: "oklch(0.2 0 0)",
+    color: SHADOW_COLOR_LIGHT,
     offsetX: 0,
     offsetY: 1,
     blur: 3,
@@ -18,7 +27,7 @@ export const SHADOW_PRESETS: Record<Exclude<ShadowPreset, "custom">, ShadowConfi
     opacity: 0.1,
   },
   medium: {
-    color: "oklch(0.2 0 0)",
+    color: SHADOW_COLOR_LIGHT,
     offsetX: 0,
     offsetY: 4,
     blur: 6,
@@ -26,7 +35,7 @@ export const SHADOW_PRESETS: Record<Exclude<ShadowPreset, "custom">, ShadowConfi
     opacity: 0.1,
   },
   strong: {
-    color: "oklch(0.2 0 0)",
+    color: SHADOW_COLOR_LIGHT,
     offsetX: 0,
     offsetY: 10,
     blur: 15,
@@ -34,7 +43,7 @@ export const SHADOW_PRESETS: Record<Exclude<ShadowPreset, "custom">, ShadowConfi
     opacity: 0.15,
   },
   brutalist: {
-    color: "oklch(0.6258 0.1775 348.3615)",
+    color: SHADOW_COLOR_LIGHT,
     offsetX: 3,
     offsetY: 3,
     blur: 0,

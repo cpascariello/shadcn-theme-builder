@@ -43,7 +43,7 @@ export function ColorEditor() {
   const { activeMode, setActiveMode, radius, setRadius } = useTheme();
 
   return (
-    <div className="w-80 flex-shrink-0 border-r flex flex-col overflow-hidden bg-background">
+    <div className="w-96 flex-shrink-0 border-r flex flex-col overflow-hidden bg-background">
       {/* Mode tabs at top */}
       <div className="p-3 border-b">
         <Tabs value={activeMode} onValueChange={(v) => setActiveMode(v as "light" | "dark")}>

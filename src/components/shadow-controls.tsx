@@ -8,8 +8,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/theme-context";
 import { ShadowPreset } from "@/lib/theme-types";
+import { oklchToHex } from "@/lib/color-utils";
+import { RotateCcw } from "lucide-react";
 
 const PRESET_OPTIONS: { value: ShadowPreset; label: string }[] = [
   { value: "none", label: "None" },
@@ -21,25 +24,30 @@ const PRESET_OPTIONS: { value: ShadowPreset; label: string }[] = [
 ];
 
 export function ShadowControls() {
-  const { shadow, shadowPreset, setShadow, setShadowPreset } = useTheme();
+  const { shadow, shadowPreset, setShadow, setShadowPreset, resetShadow } = useTheme();
 
   return (
     <div className="space-y-3">
-      {/* Preset selector */}
-      <div className="flex items-center justify-between gap-3">
+      {/* Preset selector + reset */}
+      <div className="flex items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">Preset</span>
-        <Select value={shadowPreset} onValueChange={(v) => setShadowPreset(v as ShadowPreset)}>
-          <SelectTrigger className="w-40 h-8 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {PRESET_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={shadowPreset} onValueChange={(v) => setShadowPreset(v as ShadowPreset)}>
+            <SelectTrigger className="w-32 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PRESET_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={resetShadow} title="Reset shadow">
+            <RotateCcw className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Shadow color */}
@@ -137,6 +145,12 @@ function SliderRow({
 function ShadowColorPicker() {
   const { shadow, setShadow } = useTheme();
 
+  // Convert current color to hex for the native color input
+  const color = shadow.color ?? "";
+  const hexValue = color.startsWith("#")
+    ? color
+    : oklchToHex(color) || "#000000";
+
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hex = e.target.value;
     setShadow({ color: hex });
@@ -150,6 +164,7 @@ function ShadowColorPicker() {
     <div className="flex items-center gap-2 flex-1">
       <input
         type="color"
+        value={hexValue}
         className="w-8 h-8 rounded border cursor-pointer"
         onChange={handleColorChange}
       />
