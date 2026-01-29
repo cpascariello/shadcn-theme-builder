@@ -114,5 +114,44 @@ Skills (superpowers) are tools, not separate processes. Use them naturally:
 
 ---
 
-<!-- PROJECT-SPECIFIC DOCUMENTATION BELOW -->
-<!-- Add your project's tech stack, structure, commands, etc. below this line -->
+## Project: shadcn Theme Builder
+
+Visual theme builder for shadcn/ui components with real-time preview.
+
+### Tech Stack
+
+- **Framework:** Next.js 16 (App Router), React 19
+- **Styling:** Tailwind CSS 4, shadcn/ui components (Radix UI)
+- **State:** React Context API
+- **Colors:** OKLCH color space
+- **Charts:** Recharts
+
+### Commands
+
+```bash
+npm run dev     # Start dev server at localhost:3000
+npm run build   # Production build
+npm run lint    # ESLint
+```
+
+### Key Directories
+
+```
+src/
+├── app/              # Next.js app router (page.tsx, layout.tsx, globals.css)
+├── components/       # React components
+│   ├── ui/           # shadcn/ui base components
+│   └── preview/      # Dashboard preview components
+├── context/          # Theme context (state management)
+└── lib/              # Utilities, types, presets
+```
+
+### Current Features
+
+- **Color editing:** Light/dark mode with OKLCH color picker
+- **Font selection:** Google Fonts (sans/serif/mono) with dynamic loading
+- **Shadow controls:** Presets (none/subtle/medium/strong/brutalist) + fine-tuning sliders
+- **Border radius:** Slider control
+- **Presets:** Bubblegum (default), Default, Warm, Cool, Green, High Contrast
+- **Live preview:** Dashboard with cards, charts, tables, component showcase
+- **Export:** Generate globals.css (pending font/shadow integration)
