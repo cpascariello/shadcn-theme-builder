@@ -25,12 +25,32 @@ export interface ThemeColors {
   "chart-5": string;
 }
 
+export interface FontConfig {
+  sans: string;
+  serif: string;
+  mono: string;
+}
+
+export interface ShadowConfig {
+  color: string;
+  offsetX: number;
+  offsetY: number;
+  blur: number;
+  spread: number;
+  opacity: number;
+}
+
+export type ShadowPreset = "none" | "subtle" | "medium" | "strong" | "brutalist" | "custom";
+
 export interface ThemeConfig {
   name: string;
   label: string;
   light: ThemeColors;
   dark: ThemeColors;
   radius: string;
+  fonts: FontConfig;
+  shadow: ShadowConfig;
+  shadowPreset: ShadowPreset;
 }
 
 export interface ColorGroup {
