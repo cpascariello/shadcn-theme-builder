@@ -1,25 +1,45 @@
 "use client";
 
 import { useTheme } from "@/context/theme-context";
-import { ThemeColors } from "@/lib/theme-types";
+import { ThemeColors, FontConfig, ShadowConfig } from "@/lib/theme-types";
+import { getFontStack } from "@/lib/fonts";
+import { buildShadowValue } from "@/lib/shadow-presets";
 import { StatCards } from "./stat-cards";
 import { ChartCard } from "./chart-card";
 import { RecentSales } from "./recent-sales";
 import { DataTableCard } from "./data-table-card";
 import { ComponentShowcase } from "./component-showcase";
 
-function buildCssVariables(colors: ThemeColors, radius: string): React.CSSProperties {
-  const vars: Record<string, string> = { "--radius": radius };
+function buildCssVariables(
+  colors: ThemeColors,
+  radius: string,
+  fonts: FontConfig,
+  shadow: ShadowConfig
+): React.CSSProperties {
+  const shadowValue = buildShadowValue(shadow);
+
+  const vars: Record<string, string> = {
+    "--radius": radius,
+    "--font-sans": getFontStack(fonts.sans, "sans"),
+    "--font-serif": getFontStack(fonts.serif, "serif"),
+    "--font-mono": getFontStack(fonts.mono, "mono"),
+    "--shadow": shadowValue,
+    "--shadow-sm": shadowValue,
+    "--shadow-md": shadowValue,
+    "--shadow-lg": shadowValue,
+  };
+
   for (const [key, value] of Object.entries(colors)) {
     vars[`--${key}`] = value;
   }
+
   return vars as React.CSSProperties;
 }
 
 export function DashboardPreview() {
-  const { previewMode, light, dark, radius } = useTheme();
+  const { previewMode, light, dark, radius, fonts, shadow } = useTheme();
   const colors = previewMode === "light" ? light : dark;
-  const cssVars = buildCssVariables(colors, radius);
+  const cssVars = buildCssVariables(colors, radius, fonts, shadow);
 
   return (
     <div
@@ -28,6 +48,7 @@ export function DashboardPreview() {
         ...cssVars,
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
+        fontFamily: "var(--font-sans)",
       }}
     >
       <div className="p-6 max-w-5xl mx-auto space-y-6">
