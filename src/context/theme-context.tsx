@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { ThemeColors } from "@/lib/theme-types";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
+import { ThemeColors, FontConfig, ShadowConfig, ShadowPreset } from "@/lib/theme-types";
 import { presets } from "@/lib/presets";
+import { loadGoogleFont } from "@/lib/fonts";
+import { SHADOW_PRESETS } from "@/lib/shadow-presets";
 
 interface ThemeContextValue {
   light: ThemeColors;
@@ -11,12 +13,18 @@ interface ThemeContextValue {
   activeMode: "light" | "dark";
   previewMode: "light" | "dark";
   activePreset: string;
+  fonts: FontConfig;
+  shadow: ShadowConfig;
+  shadowPreset: ShadowPreset;
 
   setColor: (mode: "light" | "dark", key: keyof ThemeColors, value: string) => void;
   setRadius: (radius: string) => void;
   setActiveMode: (mode: "light" | "dark") => void;
   setPreviewMode: (mode: "light" | "dark") => void;
   loadPreset: (presetName: string) => void;
+  setFont: (category: keyof FontConfig, font: string) => void;
+  setShadow: (updates: Partial<ShadowConfig>) => void;
+  setShadowPreset: (preset: ShadowPreset) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -29,6 +37,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [activeMode, setActiveMode] = useState<"light" | "dark">("light");
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
   const [activePreset, setActivePreset] = useState(defaultPreset.name);
+  const [fonts, setFonts] = useState<FontConfig>(defaultPreset.fonts);
+  const [shadow, setShadowState] = useState<ShadowConfig>(defaultPreset.shadow);
+  const [shadowPreset, setShadowPresetState] = useState<ShadowPreset>(defaultPreset.shadowPreset);
+
+  // Load Google fonts when fonts change
+  useEffect(() => {
+    loadGoogleFont(fonts.sans);
+    loadGoogleFont(fonts.serif);
+    loadGoogleFont(fonts.mono);
+  }, [fonts]);
 
   const setColor = useCallback(
     (mode: "light" | "dark", key: keyof ThemeColors, value: string) => {
@@ -47,12 +65,34 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setActivePreset("custom");
   }, []);
 
+  const setFont = useCallback((category: keyof FontConfig, font: string) => {
+    setFonts((prev) => ({ ...prev, [category]: font }));
+    setActivePreset("custom");
+  }, []);
+
+  const setShadow = useCallback((updates: Partial<ShadowConfig>) => {
+    setShadowState((prev) => ({ ...prev, ...updates }));
+    setShadowPresetState("custom");
+    setActivePreset("custom");
+  }, []);
+
+  const setShadowPreset = useCallback((preset: ShadowPreset) => {
+    setShadowPresetState(preset);
+    if (preset !== "custom") {
+      setShadowState(SHADOW_PRESETS[preset]);
+    }
+    setActivePreset("custom");
+  }, []);
+
   const loadPreset = useCallback((presetName: string) => {
     const preset = presets.find((p) => p.name === presetName);
     if (preset) {
       setLight(preset.light);
       setDark(preset.dark);
       setRadiusState(preset.radius);
+      setFonts(preset.fonts);
+      setShadowState(preset.shadow);
+      setShadowPresetState(preset.shadowPreset);
       setActivePreset(preset.name);
     }
   }, []);
@@ -60,8 +100,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeContext.Provider
       value={{
-        light, dark, radius, activeMode, previewMode, activePreset,
-        setColor, setRadius, setActiveMode, setPreviewMode, loadPreset,
+        light,
+        dark,
+        radius,
+        activeMode,
+        previewMode,
+        activePreset,
+        fonts,
+        shadow,
+        shadowPreset,
+        setColor,
+        setRadius,
+        setActiveMode,
+        setPreviewMode,
+        loadPreset,
+        setFont,
+        setShadow,
+        setShadowPreset,
       }}
     >
       {children}
