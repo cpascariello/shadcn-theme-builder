@@ -7,6 +7,7 @@ export const FONT_OPTIONS = {
     { name: "Nunito", value: "Nunito" },
     { name: "Work Sans", value: "Work Sans" },
     { name: "DM Sans", value: "DM Sans" },
+    { name: "Titillium Web", value: "Titillium Web" },
   ],
   serif: [
     { name: "Lora", value: "Lora" },
