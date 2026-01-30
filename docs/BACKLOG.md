@@ -15,6 +15,11 @@ Ideas and scope creep captured for later consideration.
 
 ## Open Items
 
+### 2026-01-30 - Create themes from Coolors.co palettes
+**Source:** User idea
+**Description:** Generate theme presets from Coolors.co color palette URLs (e.g. `https://coolors.co/palette/0c0f0a-ff206e-fbff12-41ead4-ffffff`). Parse the hex colors from the URL, convert to OKLCH, and map them to theme tokens (background, foreground, primary, accent, etc.). Could be an import feature or used to expand the preset library.
+**Priority:** Medium
+
 ### 2026-01-29 - Shadow color picker: hex to OKLCH conversion
 **Source:** Identified during shadow controls testing
 **Description:** When user picks a color via the native color picker, it stores hex. Could convert to OKLCH for consistency with the rest of the theme. Currently works but mixes formats.
