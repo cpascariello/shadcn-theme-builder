@@ -1,11 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import { Undo2, Redo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/theme-context";
 
 export function UndoRedoBar() {
   const { undo, redo, canUndo, canRedo } = useTheme();
+  const mod = useMemo(
+    () => (typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘" : "Ctrl+"),
+    [],
+  );
 
   return (
     <div className="flex items-center gap-1 p-3 border-b bg-background/80 backdrop-blur-sm flex-shrink-0">
@@ -14,7 +19,7 @@ export function UndoRedoBar() {
         size="icon"
         onClick={undo}
         disabled={!canUndo}
-        title="Undo (Ctrl+Z)"
+        title={`Undo (${mod}Z)`}
       >
         <Undo2 />
       </Button>
@@ -23,7 +28,7 @@ export function UndoRedoBar() {
         size="icon"
         onClick={redo}
         disabled={!canRedo}
-        title="Redo (Ctrl+Shift+Z)"
+        title={`Redo (${mod}Shift+Z)`}
       >
         <Redo2 />
       </Button>

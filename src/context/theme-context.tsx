@@ -46,10 +46,26 @@ interface ThemeContextValue {
 
 const HISTORY_MAX = 50;
 
+const defaultPreset = presets[0];
+
+// Hoisted to module scope — defaultPreset is a constant, no need to recreate per render.
+// loadedTheme is intentionally excluded: loadPreset resets history, so loadedTheme
+// can never drift out of sync with the snapshot the user undoes to.
+// previewMode is excluded because it's a view toggle, not a theme edit.
+const initialSnapshot: ThemeSnapshot = {
+  light: defaultPreset.light,
+  dark: defaultPreset.dark,
+  radius: defaultPreset.radius,
+  letterSpacing: defaultPreset.letterSpacing,
+  fonts: defaultPreset.fonts,
+  shadow: defaultPreset.shadow,
+  shadowPreset: defaultPreset.shadowPreset,
+  activePreset: defaultPreset.name,
+};
+
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const defaultPreset = presets[0];
   const [light, setLight] = useState<ThemeColors>(defaultPreset.light);
   const [dark, setDark] = useState<ThemeColors>(defaultPreset.dark);
   const [radius, setRadiusState] = useState(defaultPreset.radius);
@@ -63,27 +79,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [shadowPreset, setShadowPresetState] = useState<ShadowPreset>(defaultPreset.shadowPreset);
 
   // --- History state ---
-  const initialSnapshot: ThemeSnapshot = {
-    light: defaultPreset.light,
-    dark: defaultPreset.dark,
-    radius: defaultPreset.radius,
-    letterSpacing: defaultPreset.letterSpacing,
-    fonts: defaultPreset.fonts,
-    shadow: defaultPreset.shadow,
-    shadowPreset: defaultPreset.shadowPreset,
-    activePreset: defaultPreset.name,
-  };
   const [history, setHistory] = useState<ThemeSnapshot[]>([initialSnapshot]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
   const historyRef = useRef(history);
   const historyIndexRef = useRef(historyIndex);
   const isRestoringRef = useRef(false);
+  const [restoringFlag, setRestoringFlag] = useState(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep refs in sync
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => { historyIndexRef.current = historyIndex; }, [historyIndex]);
+
+  // Reset isRestoringRef after React commits the restored state.
+  // useEffect fires after commit, which is the correct timing guarantee
+  // (unlike requestAnimationFrame which fires after paint, not commit).
+  useEffect(() => {
+    if (restoringFlag) {
+      isRestoringRef.current = false;
+      setRestoringFlag(false);
+    }
+  }, [restoringFlag]);
 
   // Snapshot ref always reflects current undoable state
   const currentSnapshotRef = useRef<ThemeSnapshot>(initialSnapshot);
@@ -106,15 +123,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // Truncate any redo future
       const truncated = h.slice(0, idx + 1);
       const next = [...truncated, snapshot];
-      // Cap at max entries
-      if (next.length > HISTORY_MAX) {
-        next.shift();
-        setHistory(next);
-        setHistoryIndex(next.length - 1);
-      } else {
-        setHistory(next);
-        setHistoryIndex(next.length - 1);
-      }
+      if (next.length > HISTORY_MAX) next.shift();
+      setHistory(next);
+      setHistoryIndex(next.length - 1);
     }, 300);
   }, []);
 
@@ -128,10 +139,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setShadowState(snapshot.shadow);
     setShadowPresetState(snapshot.shadowPreset);
     setActivePreset(snapshot.activePreset);
-    // Reset flag after React processes the batch
-    requestAnimationFrame(() => {
-      isRestoringRef.current = false;
-    });
+    // Signal useEffect to reset isRestoringRef after commit
+    setRestoringFlag(true);
   }, []);
 
   const undo = useCallback(() => {
@@ -280,9 +289,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setHistory([snapshot]);
       setHistoryIndex(0);
 
-      requestAnimationFrame(() => {
-        isRestoringRef.current = false;
-      });
+      setRestoringFlag(true);
     }
   }, []);
 
