@@ -21,23 +21,10 @@ import { DeleteDialog } from "./delete-dialog";
 import { FileUpload } from "./file-upload";
 import { FaqAccordion } from "./faq-accordion";
 
-interface DashboardPreviewProps {
-  shadowValue: string;
-}
-
-export function DashboardPreview({ shadowValue }: DashboardPreviewProps) {
+export function DashboardPreview() {
   return (
     <div className="flex-1 overflow-y-auto bg-background">
-      {/* Override shadow classes within preview scope */}
-      <style>{`
-        .preview-scope [class*="shadow"] {
-          box-shadow: ${shadowValue} !important;
-        }
-        .preview-scope .shadow-none {
-          box-shadow: none !important;
-        }
-      `}</style>
-      <div className="preview-scope w-full p-6 space-y-6">
+      <div className="w-full p-6 space-y-6">
         {/* Section 1: 4-column masonry layout */}
         <div className="columns-1 md:columns-2 lg:columns-4 gap-6 [&>*]:mb-6 [&>*]:break-inside-avoid">
           {/* Col 1 */}

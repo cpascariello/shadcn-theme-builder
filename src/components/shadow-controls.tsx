@@ -143,21 +143,20 @@ function SliderRow({
 }
 
 function ShadowColorPicker() {
-  const { shadow, setShadow } = useTheme();
+  const { shadow, setShadow, previewMode } = useTheme();
+  const colorKey = previewMode === "light" ? "lightColor" : "darkColor";
+  const color = shadow[colorKey] ?? "";
 
-  // Convert current color to hex for the native color input
-  const color = shadow.color ?? "";
   const hexValue = color.startsWith("#")
     ? color
     : oklchToHex(color) || "#000000";
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value;
-    setShadow({ color: hex });
+    setShadow({ [colorKey]: e.target.value });
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShadow({ color: e.target.value });
+    setShadow({ [colorKey]: e.target.value });
   };
 
   return (
@@ -170,7 +169,7 @@ function ShadowColorPicker() {
       />
       <input
         type="text"
-        value={shadow.color}
+        value={color}
         onChange={handleTextChange}
         className="flex-1 h-8 px-2 text-xs font-mono border rounded bg-background"
       />

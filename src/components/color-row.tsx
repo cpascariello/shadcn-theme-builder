@@ -19,36 +19,36 @@ export function ColorRow({ variableKey, mode }: ColorRowProps) {
   const hexValue = oklchToHex(currentValue);
 
   return (
-    <div className="flex items-center gap-2 py-1">
-      {/* Label - the variable key name, smaller text */}
-      <span className="text-xs text-muted-foreground w-28 truncate">{variableKey}</span>
+    <div className="space-y-1 py-1">
+      <span className="text-xs text-muted-foreground">{variableKey}</span>
+      <div className="flex items-center gap-2">
+        {/* Color swatch button - clickable, opens hidden native color picker */}
+        <button
+          className="h-8 w-8 rounded border border-border shrink-0 cursor-pointer"
+          style={{ backgroundColor: currentValue }}
+          onClick={() => colorInputRef.current?.click()}
+          title="Pick color"
+        />
 
-      {/* Color swatch button - clickable, opens hidden native color picker */}
-      <button
-        className="h-6 w-6 rounded border border-border shrink-0 cursor-pointer"
-        style={{ backgroundColor: currentValue }}
-        onClick={() => colorInputRef.current?.click()}
-        title="Pick color"
-      />
+        {/* Hidden native color input */}
+        <input
+          ref={colorInputRef}
+          type="color"
+          className="sr-only"
+          value={hexValue}
+          onChange={(e) => {
+            const newOklch = hexToOklch(e.target.value);
+            setColor(mode, variableKey, newOklch);
+          }}
+        />
 
-      {/* Hidden native color input */}
-      <input
-        ref={colorInputRef}
-        type="color"
-        className="sr-only"
-        value={hexValue}
-        onChange={(e) => {
-          const newOklch = hexToOklch(e.target.value);
-          setColor(mode, variableKey, newOklch);
-        }}
-      />
-
-      {/* OKLCH text input */}
-      <Input
-        className="h-7 text-xs font-mono flex-1"
-        value={currentValue}
-        onChange={(e) => setColor(mode, variableKey, e.target.value)}
-      />
+        {/* OKLCH text input */}
+        <Input
+          className="text-xs font-mono flex-1 shadow-sm"
+          value={currentValue}
+          onChange={(e) => setColor(mode, variableKey, e.target.value)}
+        />
+      </div>
     </div>
   );
 }

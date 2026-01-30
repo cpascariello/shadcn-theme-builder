@@ -3,7 +3,7 @@
 import { useTheme } from "@/context/theme-context";
 import { ThemeColors, FontConfig, ShadowConfig } from "@/lib/theme-types";
 import { getFontStack } from "@/lib/fonts";
-import { buildShadowValue } from "@/lib/shadow-presets";
+import { buildShadowTiers } from "@/lib/shadow-presets";
 import { TopBar } from "@/components/top-bar";
 import { ColorEditor } from "@/components/color-editor";
 import { DashboardPreview } from "@/components/preview/dashboard-preview";
@@ -11,11 +11,12 @@ import { DashboardPreview } from "@/components/preview/dashboard-preview";
 function buildCssVariables(
   colors: ThemeColors,
   radius: string,
+  letterSpacing: string,
   fonts: FontConfig,
-  shadow: ShadowConfig
 ): React.CSSProperties {
   const vars: Record<string, string> = {
     "--radius": radius,
+    "--letter-spacing": letterSpacing,
     "--font-sans": getFontStack(fonts.sans, "sans"),
     "--font-serif": getFontStack(fonts.serif, "serif"),
     "--font-mono": getFontStack(fonts.mono, "mono"),
@@ -31,26 +32,32 @@ function buildCssVariables(
 function buildGlobalCssOverride(
   colors: ThemeColors,
   radius: string,
+  letterSpacing: string,
   fonts: FontConfig,
+  shadow: ShadowConfig,
+  mode: "light" | "dark",
 ): string {
   let css = ":root {\n";
   css += `  --radius: ${radius};\n`;
+  css += `  --letter-spacing: ${letterSpacing};\n`;
   css += `  --font-sans: ${getFontStack(fonts.sans, "sans")};\n`;
   css += `  --font-serif: ${getFontStack(fonts.serif, "serif")};\n`;
   css += `  --font-mono: ${getFontStack(fonts.mono, "mono")};\n`;
   for (const [key, value] of Object.entries(colors)) {
     css += `  --${key}: ${value};\n`;
   }
+  const tiers = buildShadowTiers(shadow, mode);
+  for (const [key, value] of Object.entries(tiers)) {
+    css += `  ${key}: ${value};\n`;
+  }
   css += "}";
   return css;
 }
 
 export default function Home() {
-  const { previewMode, light, dark, radius, fonts, shadow } = useTheme();
+  const { previewMode, light, dark, radius, letterSpacing, fonts, shadow } = useTheme();
   const colors = previewMode === "light" ? light : dark;
-  const cssVars = buildCssVariables(colors, radius, fonts, shadow);
-  const shadowValue = buildShadowValue(shadow);
-
+  const cssVars = buildCssVariables(colors, radius, letterSpacing, fonts);
   return (
     <div
       className={`flex flex-col h-screen ${previewMode === "dark" ? "dark" : ""}`}
@@ -59,16 +66,11 @@ export default function Home() {
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
         fontFamily: "var(--font-sans)",
+        letterSpacing: "var(--letter-spacing)",
       }}
     >
       {/* Apply theme variables to :root so portaled content (dropdowns, dialogs) inherits them */}
-      <style>{buildGlobalCssOverride(colors, radius, fonts)}</style>
-      {/* Global shadow override */}
-      <style>{`
-        .themed-shadow {
-          box-shadow: ${shadowValue} !important;
-        }
-      `}</style>
+      <style>{buildGlobalCssOverride(colors, radius, letterSpacing, fonts, shadow, previewMode)}</style>
 
       {/* Fixed header */}
       <div className="flex-shrink-0">
@@ -78,7 +80,7 @@ export default function Home() {
       {/* Main content - two independently scrollable panes */}
       <div className="flex flex-1 min-h-0">
         <ColorEditor />
-        <DashboardPreview shadowValue={shadowValue} />
+        <DashboardPreview />
       </div>
     </div>
   );

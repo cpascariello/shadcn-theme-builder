@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { useState, useMemo } from "react";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { COLOR_GROUPS } from "@/lib/theme-types";
 import { ColorRow } from "./color-row";
@@ -21,85 +20,119 @@ function CollapsibleSection({ title, defaultOpen = true, children }: Collapsible
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div>
+    <div className="rounded-lg border border-border overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 w-full text-left text-sm font-medium mb-2 hover:text-primary transition-colors"
+        className="flex items-center justify-between w-full px-4 py-3 text-sm font-semibold uppercase tracking-wide hover:bg-muted/50 transition-colors"
       >
-        {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         {title}
+        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
       {isOpen && (
-        <>
-          <Separator className="mb-3" />
+        <div className="px-4 pb-4 pt-1 border-t border-border">
           {children}
-        </>
+        </div>
       )}
     </div>
   );
 }
 
 export function ColorEditor() {
-  const { activeMode, setActiveMode, radius, setRadius } = useTheme();
+  const { previewMode, radius, setRadius, letterSpacing, setLetterSpacing } = useTheme();
+  const [search, setSearch] = useState("");
+
+  const filteredGroups = useMemo(() => {
+    if (!search.trim()) return COLOR_GROUPS;
+    const q = search.toLowerCase();
+    return COLOR_GROUPS
+      .map((group) => ({
+        ...group,
+        variables: group.variables.filter((v) => v.toLowerCase().includes(q)),
+      }))
+      .filter((group) => group.variables.length > 0);
+  }, [search]);
+
+  const isSearching = search.trim().length > 0;
 
   return (
     <div className="w-96 flex-shrink-0 border-r flex flex-col overflow-hidden bg-background">
-      {/* Mode tabs at top */}
+      {/* Search */}
       <div className="p-3 border-b">
-        <Tabs value={activeMode} onValueChange={(v) => setActiveMode(v as "light" | "dark")}>
-          <TabsList className="w-full">
-            <TabsTrigger value="light" className="flex-1">Light</TabsTrigger>
-            <TabsTrigger value="dark" className="flex-1">Dark</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tokens..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 text-sm"
+          />
+        </div>
       </div>
 
       {/* Scrollable sections */}
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        {/* Colors section (inside tabs - mode-specific) */}
-        <CollapsibleSection title="Colors">
-          <div className="space-y-4">
-            {COLOR_GROUPS.map((group) => (
-              <div key={group.label}>
-                <h4 className="text-xs font-medium text-muted-foreground mb-2">{group.label}</h4>
-                {group.variables.map((varKey) => (
-                  <ColorRow key={varKey} variableKey={varKey} mode={activeMode} />
-                ))}
+        {/* Color groups — each is its own collapsible section */}
+        {filteredGroups.map((group) => (
+          <CollapsibleSection key={group.label} title={group.label} defaultOpen={isSearching || true}>
+            <div className="space-y-1">
+              {group.variables.map((varKey) => (
+                <ColorRow key={varKey} variableKey={varKey} mode={previewMode} />
+              ))}
+            </div>
+          </CollapsibleSection>
+        ))}
+
+        {!isSearching && (
+          <>
+            {/* Fonts section */}
+            <CollapsibleSection title="Fonts" defaultOpen>
+              <div className="space-y-3">
+                <FontPicker category="sans" label="Sans" />
+                <FontPicker category="serif" label="Serif" />
+                <FontPicker category="mono" label="Mono" />
               </div>
-            ))}
-          </div>
-        </CollapsibleSection>
+            </CollapsibleSection>
 
-        {/* Fonts section (shared across modes) */}
-        <CollapsibleSection title="Fonts">
-          <div className="space-y-3">
-            <FontPicker category="sans" label="Sans" />
-            <FontPicker category="serif" label="Serif" />
-            <FontPicker category="mono" label="Mono" />
-          </div>
-        </CollapsibleSection>
+            {/* Border Radius section */}
+            <CollapsibleSection title="Border Radius" defaultOpen>
+              <div className="flex items-center gap-3">
+                <Slider
+                  value={[parseFloat(radius)]}
+                  onValueChange={([v]) => setRadius(`${v}rem`)}
+                  min={0}
+                  max={3}
+                  step={0.125}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-14 text-right font-mono">
+                  {radius}
+                </span>
+              </div>
+            </CollapsibleSection>
 
-        {/* Radius section (shared) */}
-        <CollapsibleSection title="Radius">
-          <div className="flex items-center gap-3">
-            <Slider
-              value={[parseFloat(radius)]}
-              onValueChange={([v]) => setRadius(`${v}rem`)}
-              min={0}
-              max={1}
-              step={0.025}
-              className="flex-1"
-            />
-            <span className="text-xs text-muted-foreground w-14 text-right font-mono">
-              {radius}
-            </span>
-          </div>
-        </CollapsibleSection>
+            {/* Shadows section */}
+            <CollapsibleSection title="Shadows" defaultOpen>
+              <ShadowControls />
+            </CollapsibleSection>
 
-        {/* Shadows section (shared) */}
-        <CollapsibleSection title="Shadows">
-          <ShadowControls />
-        </CollapsibleSection>
+            {/* Letter Spacing section */}
+            <CollapsibleSection title="Letter Spacing" defaultOpen>
+              <div className="flex items-center gap-3">
+                <Slider
+                  value={[parseFloat(letterSpacing)]}
+                  onValueChange={([v]) => setLetterSpacing(`${v}em`)}
+                  min={-1}
+                  max={1}
+                  step={0.01}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-14 text-right font-mono">
+                  {letterSpacing}
+                </span>
+              </div>
+            </CollapsibleSection>
+          </>
+        )}
       </div>
     </div>
   );

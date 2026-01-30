@@ -18,6 +18,14 @@ export interface ThemeColors {
   border: string;
   input: string;
   ring: string;
+  sidebar: string;
+  "sidebar-foreground": string;
+  "sidebar-primary": string;
+  "sidebar-primary-foreground": string;
+  "sidebar-accent": string;
+  "sidebar-accent-foreground": string;
+  "sidebar-border": string;
+  "sidebar-ring": string;
   "chart-1": string;
   "chart-2": string;
   "chart-3": string;
@@ -32,7 +40,8 @@ export interface FontConfig {
 }
 
 export interface ShadowConfig {
-  color: string;
+  lightColor: string;
+  darkColor: string;
   offsetX: number;
   offsetY: number;
   blur: number;
@@ -48,6 +57,7 @@ export interface ThemeConfig {
   light: ThemeColors;
   dark: ThemeColors;
   radius: string;
+  letterSpacing: string;
   fonts: FontConfig;
   shadow: ShadowConfig;
   shadowPreset: ShadowPreset;
@@ -59,14 +69,10 @@ export interface ColorGroup {
 }
 
 export const COLOR_GROUPS: ColorGroup[] = [
-  { label: "Base", variables: ["background", "foreground"] },
-  { label: "Card", variables: ["card", "card-foreground"] },
-  { label: "Popover", variables: ["popover", "popover-foreground"] },
-  { label: "Primary", variables: ["primary", "primary-foreground"] },
-  { label: "Secondary", variables: ["secondary", "secondary-foreground"] },
-  { label: "Muted", variables: ["muted", "muted-foreground"] },
-  { label: "Accent", variables: ["accent", "accent-foreground"] },
-  { label: "Destructive", variables: ["destructive", "destructive-foreground"] },
-  { label: "Border & Ring", variables: ["border", "input", "ring"] },
+  { label: "Backgrounds", variables: ["background", "card", "card-foreground", "popover", "popover-foreground", "muted", "muted-foreground"] },
+  { label: "Text", variables: ["foreground", "primary-foreground", "secondary-foreground", "accent-foreground", "destructive-foreground", "sidebar-foreground", "sidebar-primary-foreground", "sidebar-accent-foreground"] },
+  { label: "Accents", variables: ["primary", "secondary", "accent", "destructive", "sidebar-primary", "sidebar-accent"] },
+  { label: "Borders", variables: ["border", "input", "ring", "sidebar-border", "sidebar-ring"] },
   { label: "Charts", variables: ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"] },
+  { label: "Sidebar", variables: ["sidebar"] },
 ];
