@@ -32,6 +32,7 @@ src/
 │   ├── color-row.tsx      # Individual color picker row
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
+│   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
 │   ├── top-bar.tsx        # Header with preset selector
 │   ├── export-dialog.tsx  # CSS export modal
 │   └── preview/
@@ -57,7 +58,7 @@ src/
 │       ├── file-upload.tsx          # Upload dropzone
 │       └── faq-accordion.tsx        # Accordion FAQ
 ├── context/
-│   └── theme-context.tsx  # All theme state + setters
+│   └── theme-context.tsx  # All theme state + setters + undo/redo history
 └── lib/
     ├── theme-types.ts     # TypeScript interfaces
     ├── presets.ts         # Theme presets (Bubblegum, etc.)
@@ -119,3 +120,10 @@ src/
 **Approach:** `ShadowConfig` stores `lightColor` and `darkColor` separately. `buildShadowTiers()` generates all 8 shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`) from the shadow config and current mode. These are injected at runtime via `buildGlobalCssOverride()`, so Tailwind shadow utilities resolve to themed values. Shadow preset changes only modify geometry, preserving user-set colors. `loadedTheme` state tracks the last loaded theme for accurate reset.
 **Key files:** `src/lib/shadow-presets.ts`, `src/context/theme-context.tsx`, `src/components/shadow-controls.tsx`
 **Notes:** `loadedTheme` is separate from `activePreset` because the latter is set to "custom" on any user tweak. Export dialog uses the same `buildShadowTiers()` for CSS output.
+
+### Undo/Redo History
+**Date:** 2026-01-30
+**Context:** Users need to revert theme edits without manually tracking values
+**Approach:** `ThemeProvider` maintains a history stack (max 50 `ThemeSnapshot` entries) and an index pointer. Every setter calls a debounced (300ms) `pushHistory()` before mutating, so slider drags and rapid color picks coalesce into one entry. `undo()`/`redo()` apply snapshots via `applySnapshot()`, guarded by `isRestoringRef` to prevent recursive pushes. Keyboard shortcuts (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z, Cmd/Ctrl+Y) are registered in a `useEffect`. Loading a preset resets history to a single entry.
+**Key files:** `src/context/theme-context.tsx`, `src/components/undo-redo-bar.tsx`, `src/app/page.tsx`
+**Notes:** Refs (`historyRef`, `historyIndexRef`, `currentSnapshotRef`) mirror state to avoid stale closures in the debounced callback. `previewMode` is intentionally excluded from snapshots — it's a view toggle, not a theme edit.

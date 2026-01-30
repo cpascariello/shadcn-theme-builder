@@ -7,6 +7,7 @@ import { buildShadowTiers } from "@/lib/shadow-presets";
 import { TopBar } from "@/components/top-bar";
 import { ColorEditor } from "@/components/color-editor";
 import { DashboardPreview } from "@/components/preview/dashboard-preview";
+import { UndoRedoBar } from "@/components/undo-redo-bar";
 
 function buildCssVariables(
   colors: ThemeColors,
@@ -80,7 +81,10 @@ export default function Home() {
       {/* Main content - two independently scrollable panes */}
       <div className="flex flex-1 min-h-0">
         <ColorEditor />
-        <DashboardPreview />
+        <div className="flex flex-col flex-1 min-h-0 min-w-0">
+          <UndoRedoBar />
+          <DashboardPreview />
+        </div>
       </div>
     </div>
   );
