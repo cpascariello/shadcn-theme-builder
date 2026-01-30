@@ -147,7 +147,7 @@ export function ExportDialog() {
           Export
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="sm:max-w-3xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Export globals.css</DialogTitle>
         </DialogHeader>
@@ -170,7 +170,7 @@ export function ExportDialog() {
               </>
             )}
           </Button>
-          <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[60vh] text-sm font-mono">
+          <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[60vh] text-sm font-mono whitespace-pre-wrap break-all">
             <code>{css}</code>
           </pre>
         </div>
