@@ -44,7 +44,7 @@ export function ColorRow({ variableKey, mode }: ColorRowProps) {
 
         {/* OKLCH text input */}
         <Input
-          className="text-xs font-mono flex-1 shadow-sm"
+          className="text-xs font-mono flex-1 shadow-xs"
           value={currentValue}
           onChange={(e) => setColor(mode, variableKey, e.target.value)}
         />

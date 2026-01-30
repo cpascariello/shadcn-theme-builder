@@ -18,7 +18,7 @@ export function TopBar() {
 
   return (
     <div className="flex items-center justify-between h-14 border-b px-4 bg-background">
-      <span className="font-semibold">shadcn Theme Builder</span>
+      <span className="font-semibold">ShadCN Theme Builder</span>
 
       <div className="flex items-center gap-2">
         <Select value={activePreset} onValueChange={loadPreset}>

@@ -46,14 +46,14 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --shadow-2xs: var(--shadow);
-  --shadow-xs: var(--shadow);
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow: var(--shadow);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-lg);
-  --shadow-2xl: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
 }
 
 :root {
@@ -93,10 +93,6 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Georgia", ui-serif, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --shadow: 0px 4px 6px -1px oklch(0.2 0 0 / 0.1);
-  --shadow-sm: 0px 1px 2px 0px oklch(0.2 0 0 / 0.05);
-  --shadow-md: 0px 4px 6px -1px oklch(0.2 0 0 / 0.1);
-  --shadow-lg: 0px 10px 15px -3px oklch(0.2 0 0 / 0.1);
 }
 
 .dark {
@@ -132,10 +128,6 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --shadow: 0px 4px 6px -1px oklch(0.9 0 0 / 0.1);
-  --shadow-sm: 0px 1px 2px 0px oklch(0.9 0 0 / 0.05);
-  --shadow-md: 0px 4px 6px -1px oklch(0.9 0 0 / 0.1);
-  --shadow-lg: 0px 10px 15px -3px oklch(0.9 0 0 / 0.1);
 }
 
 @layer base {

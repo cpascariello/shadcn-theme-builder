@@ -104,14 +104,14 @@ export function buildShadowTiers(shadow: ShadowConfig, mode: "light" | "dark"): 
     return color;
   };
 
-  const halfOp = opacity * 0.5;
+  const dimOp = opacity * 0.25;
   const fullOp = opacity;
   const x = offsetX;
   const y = offsetY;
 
   return {
-    "--shadow-2xs": `${x}px ${y}px ${blur}px ${spread}px ${c(halfOp)}`,
-    "--shadow-xs": `${x}px ${y}px ${blur}px ${spread}px ${c(halfOp)}`,
+    "--shadow-2xs": `${x}px ${y}px ${blur}px ${spread}px ${c(dimOp)}`,
+    "--shadow-xs": `${x}px ${y}px ${blur}px ${spread}px ${c(dimOp)}`,
     "--shadow-sm": `${x}px ${y}px ${blur}px ${spread}px ${c(fullOp)}, ${x}px 1px 2px -1px ${c(fullOp)}`,
     "--shadow": `${x}px ${y}px ${blur}px ${spread}px ${c(fullOp)}, ${x}px 1px 2px -1px ${c(fullOp)}`,
     "--shadow-md": `${x}px ${y}px ${blur}px ${spread}px ${c(fullOp)}, ${x}px 2px 4px -1px ${c(fullOp)}`,
