@@ -77,3 +77,31 @@ export function hexToOklch(hex: string): string {
 
   return `oklch(${Lr} ${Cr} ${Hr})`;
 }
+
+/**
+ * Parse an oklch() CSS string into its L, C, H components.
+ */
+export function parseOklch(oklch: string): { l: number; c: number; h: number } | null {
+  const match = oklch.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+  if (!match) return null;
+  return { l: parseFloat(match[1]), c: parseFloat(match[2]), h: parseFloat(match[3]) };
+}
+
+/**
+ * Build an oklch() CSS string from L, C, H values.
+ */
+export function buildOklch(l: number, c: number, h: number): string {
+  return `oklch(${l.toFixed(4)} ${c.toFixed(4)} ${h.toFixed(4)})`;
+}
+
+/**
+ * Shift the hue of an oklch() color by the given degrees.
+ * Achromatic colors (chroma < 0.001) are returned unchanged.
+ */
+export function shiftHue(oklch: string, degrees: number): string {
+  const parsed = parseOklch(oklch);
+  if (!parsed || parsed.c < 0.001) return oklch;
+  let h = (parsed.h + degrees) % 360;
+  if (h < 0) h += 360;
+  return buildOklch(parsed.l, parsed.c, h);
+}

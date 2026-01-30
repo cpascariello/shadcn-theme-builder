@@ -5,6 +5,7 @@ import { ThemeColors, FontConfig, ShadowConfig, ShadowPreset } from "@/lib/theme
 import { presets } from "@/lib/presets";
 import { loadGoogleFont } from "@/lib/fonts";
 import { SHADOW_PRESETS } from "@/lib/shadow-presets";
+import { shiftHue } from "@/lib/color-utils";
 
 interface ThemeSnapshot {
   light: ThemeColors;
@@ -15,6 +16,7 @@ interface ThemeSnapshot {
   shadow: ShadowConfig;
   shadowPreset: ShadowPreset;
   activePreset: string;
+  hueShift: number;
 }
 
 interface ThemeContextValue {
@@ -37,6 +39,9 @@ interface ThemeContextValue {
   setShadow: (updates: Partial<ShadowConfig>) => void;
   setShadowPreset: (preset: ShadowPreset) => void;
   resetShadow: () => void;
+
+  hueShift: number;
+  setHueShift: (degrees: number) => void;
 
   undo: () => void;
   redo: () => void;
@@ -61,7 +66,17 @@ const initialSnapshot: ThemeSnapshot = {
   shadow: defaultPreset.shadow,
   shadowPreset: defaultPreset.shadowPreset,
   activePreset: defaultPreset.name,
+  hueShift: 0,
 };
+
+function applyHueShiftToColors(colors: ThemeColors, degrees: number): ThemeColors {
+  const shifted = { ...colors };
+  for (const key of Object.keys(shifted) as (keyof ThemeColors)[]) {
+    if (key === "destructive" || key === "destructive-foreground") continue;
+    shifted[key] = shiftHue(shifted[key], degrees);
+  }
+  return shifted;
+}
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
@@ -77,6 +92,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [letterSpacing, setLetterSpacingState] = useState(defaultPreset.letterSpacing);
   const [shadow, setShadowState] = useState<ShadowConfig>(defaultPreset.shadow);
   const [shadowPreset, setShadowPresetState] = useState<ShadowPreset>(defaultPreset.shadowPreset);
+  const [hueShift, setHueShiftState] = useState(0);
 
   // --- History state ---
   const [history, setHistory] = useState<ThemeSnapshot[]>([initialSnapshot]);
@@ -106,9 +122,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const currentSnapshotRef = useRef<ThemeSnapshot>(initialSnapshot);
   useEffect(() => {
     currentSnapshotRef.current = {
-      light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset,
+      light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift,
     };
-  }, [light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset]);
+  }, [light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift]);
 
   // Debounced push: captures post-mutation state after 300ms settle
   const pushHistory = useCallback(() => {
@@ -139,6 +155,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setShadowState(snapshot.shadow);
     setShadowPresetState(snapshot.shadowPreset);
     setActivePreset(snapshot.activePreset);
+    setHueShiftState(snapshot.hueShift);
     // Signal useEffect to reset isRestoringRef after commit
     setRestoringFlag(true);
   }, []);
@@ -206,6 +223,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setDark((prev) => ({ ...prev, [key]: value }));
       }
       setActivePreset("custom");
+      setHueShiftState(0);
     },
     [pushHistory]
   );
@@ -269,6 +287,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setShadowPresetState(preset.shadowPreset);
       setActivePreset(preset.name);
       setLoadedTheme(preset.name);
+      setHueShiftState(0);
 
       // Reset history to single entry with the new preset
       const snapshot: ThemeSnapshot = {
@@ -280,6 +299,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         shadow: preset.shadow,
         shadowPreset: preset.shadowPreset,
         activePreset: preset.name,
+        hueShift: 0,
       };
       // Flush any pending debounced push
       if (debounceTimerRef.current) {
@@ -292,6 +312,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setRestoringFlag(true);
     }
   }, []);
+
+  const setHueShift = useCallback((degrees: number) => {
+    const preset = presets.find((p) => p.name === loadedTheme);
+    if (!preset) return;
+    if (!isRestoringRef.current) pushHistory();
+    setLight(applyHueShiftToColors(preset.light, degrees));
+    setDark(applyHueShiftToColors(preset.dark, degrees));
+    setHueShiftState(degrees);
+  }, [loadedTheme, pushHistory]);
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -317,6 +346,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setShadow,
         setShadowPreset,
         resetShadow,
+        hueShift,
+        setHueShift,
         undo,
         redo,
         canUndo,
