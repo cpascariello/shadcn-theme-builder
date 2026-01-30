@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "@/context/theme-context";
 import { oklchToHex, hexToOklch } from "@/lib/color-utils";
@@ -13,7 +12,6 @@ interface ColorRowProps {
 
 export function ColorRow({ variableKey, mode }: ColorRowProps) {
   const { light, dark, setColor } = useTheme();
-  const colorInputRef = useRef<HTMLInputElement>(null);
 
   const currentValue = mode === "light" ? light[variableKey] : dark[variableKey];
   const hexValue = oklchToHex(currentValue);
@@ -22,25 +20,22 @@ export function ColorRow({ variableKey, mode }: ColorRowProps) {
     <div className="space-y-1 py-1">
       <span className="text-xs text-muted-foreground">{variableKey}</span>
       <div className="flex items-center gap-2">
-        {/* Color swatch button - clickable, opens hidden native color picker */}
-        <button
-          className="h-8 w-8 rounded border border-border shrink-0 cursor-pointer"
-          style={{ backgroundColor: currentValue }}
-          onClick={() => colorInputRef.current?.click()}
-          title="Pick color"
-        />
-
-        {/* Hidden native color input */}
-        <input
-          ref={colorInputRef}
-          type="color"
-          className="sr-only"
-          value={hexValue}
-          onChange={(e) => {
-            const newOklch = hexToOklch(e.target.value);
-            setColor(mode, variableKey, newOklch);
-          }}
-        />
+        {/* Color swatch with hidden native color picker layered on top */}
+        <div className="relative h-8 w-8 shrink-0">
+          <div
+            className="absolute inset-0 rounded border border-border"
+            style={{ backgroundColor: currentValue }}
+          />
+          <input
+            type="color"
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            value={hexValue}
+            onChange={(e) => {
+              const newOklch = hexToOklch(e.target.value);
+              setColor(mode, variableKey, newOklch);
+            }}
+          />
+        </div>
 
         {/* OKLCH text input */}
         <Input
