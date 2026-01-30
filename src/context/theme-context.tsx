@@ -5,7 +5,7 @@ import { ThemeColors, FontConfig, ShadowConfig, ShadowPreset } from "@/lib/theme
 import { presets } from "@/lib/presets";
 import { loadGoogleFont } from "@/lib/fonts";
 import { SHADOW_PRESETS } from "@/lib/shadow-presets";
-import { shiftHue } from "@/lib/color-utils";
+import { shiftHue, shiftLightness } from "@/lib/color-utils";
 
 interface ThemeSnapshot {
   light: ThemeColors;
@@ -17,6 +17,7 @@ interface ThemeSnapshot {
   shadowPreset: ShadowPreset;
   activePreset: string;
   hueShift: number;
+  lightnessShift: number;
 }
 
 interface ThemeContextValue {
@@ -42,6 +43,8 @@ interface ThemeContextValue {
 
   hueShift: number;
   setHueShift: (degrees: number) => void;
+  lightnessShift: number;
+  setLightnessShift: (amount: number) => void;
 
   undo: () => void;
   redo: () => void;
@@ -51,7 +54,7 @@ interface ThemeContextValue {
 
 const HISTORY_MAX = 50;
 
-const defaultPreset = presets[0];
+const defaultPreset = presets.find((p) => p.name === "retro") ?? presets[0];
 
 // Hoisted to module scope — defaultPreset is a constant, no need to recreate per render.
 // loadedTheme is intentionally excluded: loadPreset resets history, so loadedTheme
@@ -67,13 +70,17 @@ const initialSnapshot: ThemeSnapshot = {
   shadowPreset: defaultPreset.shadowPreset,
   activePreset: defaultPreset.name,
   hueShift: 0,
+  lightnessShift: 0,
 };
 
-function applyHueShiftToColors(colors: ThemeColors, degrees: number): ThemeColors {
+function applyColorShifts(colors: ThemeColors, hueDeg: number, lightnessAmt: number): ThemeColors {
   const shifted = { ...colors };
   for (const key of Object.keys(shifted) as (keyof ThemeColors)[]) {
     if (key === "destructive" || key === "destructive-foreground") continue;
-    shifted[key] = shiftHue(shifted[key], degrees);
+    let value = shifted[key];
+    if (hueDeg !== 0) value = shiftHue(value, hueDeg);
+    if (lightnessAmt !== 0) value = shiftLightness(value, lightnessAmt);
+    shifted[key] = value;
   }
   return shifted;
 }
@@ -84,7 +91,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [light, setLight] = useState<ThemeColors>(defaultPreset.light);
   const [dark, setDark] = useState<ThemeColors>(defaultPreset.dark);
   const [radius, setRadiusState] = useState(defaultPreset.radius);
-  const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
+  const [previewMode, setPreviewMode] = useState<"light" | "dark">("dark");
   const [activePreset, setActivePreset] = useState(defaultPreset.name);
   // Tracks which theme was last loaded via loadPreset — survives customization
   const [loadedTheme, setLoadedTheme] = useState(defaultPreset.name);
@@ -93,6 +100,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [shadow, setShadowState] = useState<ShadowConfig>(defaultPreset.shadow);
   const [shadowPreset, setShadowPresetState] = useState<ShadowPreset>(defaultPreset.shadowPreset);
   const [hueShift, setHueShiftState] = useState(0);
+  const [lightnessShift, setLightnessShiftState] = useState(0);
 
   // --- History state ---
   const [history, setHistory] = useState<ThemeSnapshot[]>([initialSnapshot]);
@@ -122,9 +130,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const currentSnapshotRef = useRef<ThemeSnapshot>(initialSnapshot);
   useEffect(() => {
     currentSnapshotRef.current = {
-      light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift,
+      light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift,
     };
-  }, [light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift]);
+  }, [light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift]);
 
   // Debounced push: captures post-mutation state after 300ms settle
   const pushHistory = useCallback(() => {
@@ -156,6 +164,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setShadowPresetState(snapshot.shadowPreset);
     setActivePreset(snapshot.activePreset);
     setHueShiftState(snapshot.hueShift);
+    setLightnessShiftState(snapshot.lightnessShift);
     // Signal useEffect to reset isRestoringRef after commit
     setRestoringFlag(true);
   }, []);
@@ -224,6 +233,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
       setActivePreset("custom");
       setHueShiftState(0);
+      setLightnessShiftState(0);
     },
     [pushHistory]
   );
@@ -288,6 +298,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setActivePreset(preset.name);
       setLoadedTheme(preset.name);
       setHueShiftState(0);
+      setLightnessShiftState(0);
 
       // Reset history to single entry with the new preset
       const snapshot: ThemeSnapshot = {
@@ -300,6 +311,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         shadowPreset: preset.shadowPreset,
         activePreset: preset.name,
         hueShift: 0,
+        lightnessShift: 0,
       };
       // Flush any pending debounced push
       if (debounceTimerRef.current) {
@@ -317,9 +329,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const preset = presets.find((p) => p.name === loadedTheme);
     if (!preset) return;
     if (!isRestoringRef.current) pushHistory();
-    setLight(applyHueShiftToColors(preset.light, degrees));
-    setDark(applyHueShiftToColors(preset.dark, degrees));
+    const ls = currentSnapshotRef.current.lightnessShift;
+    setLight(applyColorShifts(preset.light, degrees, ls));
+    setDark(applyColorShifts(preset.dark, degrees, ls));
     setHueShiftState(degrees);
+  }, [loadedTheme, pushHistory]);
+
+  const setLightnessShift = useCallback((amount: number) => {
+    const preset = presets.find((p) => p.name === loadedTheme);
+    if (!preset) return;
+    if (!isRestoringRef.current) pushHistory();
+    const hs = currentSnapshotRef.current.hueShift;
+    setLight(applyColorShifts(preset.light, hs, amount));
+    setDark(applyColorShifts(preset.dark, hs, amount));
+    setLightnessShiftState(amount);
   }, [loadedTheme, pushHistory]);
 
   const canUndo = historyIndex > 0;
@@ -348,6 +371,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         resetShadow,
         hueShift,
         setHueShift,
+        lightnessShift,
+        setLightnessShift,
         undo,
         redo,
         canUndo,

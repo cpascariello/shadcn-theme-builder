@@ -33,7 +33,7 @@ src/
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
 │   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
-│   ├── top-bar.tsx        # Header with preset selector + hue shift slider
+│   ├── top-bar.tsx        # Header with preset selector + mode toggle
 │   ├── export-dialog.tsx  # CSS export modal
 │   └── preview/
 │       ├── dashboard-preview.tsx    # Preview container (masonry layout)
@@ -56,7 +56,8 @@ src/
 │       ├── login-form.tsx           # Auth form
 │       ├── delete-dialog.tsx        # Confirmation dialog
 │       ├── file-upload.tsx          # Upload dropzone
-│       └── faq-accordion.tsx        # Accordion FAQ
+│       ├── faq-accordion.tsx        # Accordion FAQ
+│       └── sidebar-rail.tsx         # Icon rail sidebar (exercises --sidebar-* tokens)
 ├── context/
 │   └── theme-context.tsx  # All theme state + setters + undo/redo history
 └── lib/
@@ -64,7 +65,7 @@ src/
     ├── presets.ts         # Theme presets (Bubblegum, etc.)
     ├── fonts.ts           # Font options + loader
     ├── shadow-presets.ts  # Shadow presets + builder
-    ├── color-utils.ts     # OKLCH ↔ Hex conversion + hue shift
+    ├── color-utils.ts     # OKLCH ↔ Hex conversion + hue/lightness shift
     └── utils.ts           # cn() helper
 ```
 
@@ -96,9 +97,9 @@ src/
 ### Collapsible Sections
 **Date:** 2026-01-29, updated 2026-01-30
 **Context:** Color editor has many controls, needs organization
-**Approach:** `CollapsibleSection` component with bordered card UI, uppercase title, chevron toggle. Semantic color groups: Backgrounds, Text, Accents, Borders, Charts, Sidebar. Non-color sections: Fonts, Border Radius, Shadows, Letter Spacing.
+**Approach:** `CollapsibleSection` component with bordered card UI, uppercase title, chevron toggle. Semantic color groups: Backgrounds, Text, Accents, Borders, Charts, Sidebar. Non-color sections: Color Shifts, Fonts, Border Radius, Shadows, Letter Spacing.
 **Key files:** `src/components/color-editor.tsx`
-**Notes:** All sections default open. Search bar filters by both token name and section title. Light/dark mode controlled solely by the header toggle (`previewMode`).
+**Notes:** All sections default open except Color Shifts (collapsed by default). Search bar filters by both token name and section title. Light/dark mode controlled solely by the header toggle (`previewMode`).
 
 ### Masonry Preview Layout
 **Date:** 2026-01-29
@@ -121,12 +122,19 @@ src/
 **Key files:** `src/lib/shadow-presets.ts`, `src/context/theme-context.tsx`, `src/components/shadow-controls.tsx`
 **Notes:** `loadedTheme` is separate from `activePreset` because the latter is set to "custom" on any user tweak. Export dialog uses the same `buildShadowTiers()` for CSS output.
 
-### Hue Shift
+### Color Shifts (Hue + Lightness)
 **Date:** 2026-01-30
 **Context:** Users want to explore color variations of a preset without manually editing every token
-**Approach:** A slider (-180° to +180°) in the top bar rotates OKLCH hue values for all color tokens. `setHueShift` always applies the shift from the original preset colors (looked up via `loadedTheme`), not cumulatively. Destructive colors and achromatic tokens (chroma < 0.001) are pinned. Shadow colors are unaffected. `hueShift` is included in `ThemeSnapshot` for undo/redo support.
-**Key files:** `src/lib/color-utils.ts`, `src/context/theme-context.tsx`, `src/components/top-bar.tsx`
-**Notes:** Uses `loadedTheme` (not `activePreset`) so the slider survives non-color edits (shadows, radius, fonts) that set `activePreset` to "custom". Manual color edits (`setColor`) reset hue shift to 0. Loading a new preset resets to 0.
+**Approach:** Two sliders in a "Color Shifts" collapsible card in the side panel: Hue (-180° to +180°) rotates OKLCH hue, Lightness (-0.15 to +0.15) shifts OKLCH lightness. Both are always applied together from the original preset colors via `applyColorShifts()` to avoid cumulative drift. Destructive colors and achromatic tokens (chroma < 0.001) are pinned for hue shift. Shadow colors are unaffected. Both values are included in `ThemeSnapshot` for undo/redo support.
+**Key files:** `src/lib/color-utils.ts`, `src/context/theme-context.tsx`, `src/components/color-editor.tsx`
+**Notes:** Uses `loadedTheme` (not `activePreset`) so the sliders survive non-color edits (shadows, radius, fonts) that set `activePreset` to "custom". Manual color edits (`setColor`) reset both shifts to 0. Loading a new preset resets both to 0. Card is collapsed by default.
+
+### Sidebar Rail Preview
+**Date:** 2026-01-30
+**Context:** Sidebar theme tokens (--sidebar, --sidebar-foreground, etc.) were defined in presets and exported but never visually demonstrated
+**Approach:** Icon-only vertical rail (56px) on the left edge of the preview pane. Uses all 8 sidebar CSS variables directly via inline styles. Self-contained in a single component for easy removal.
+**Key files:** `src/components/preview/sidebar-rail.tsx`, `src/components/preview/dashboard-preview.tsx`
+**Notes:** DashboardPreview wraps existing masonry content in a flex row with the rail. To remove: delete `sidebar-rail.tsx` and revert the wrapper in `dashboard-preview.tsx`.
 
 ### Undo/Redo History
 **Date:** 2026-01-30

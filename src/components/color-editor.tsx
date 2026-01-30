@@ -38,7 +38,7 @@ function CollapsibleSection({ title, defaultOpen = true, children }: Collapsible
 }
 
 export function ColorEditor() {
-  const { previewMode, radius, setRadius, letterSpacing, setLetterSpacing } = useTheme();
+  const { previewMode, radius, setRadius, letterSpacing, setLetterSpacing, hueShift, setHueShift, lightnessShift, setLightnessShift } = useTheme();
   const [search, setSearch] = useState("");
 
   const q = search.trim().toLowerCase();
@@ -75,6 +75,42 @@ export function ColorEditor() {
 
       {/* Scrollable sections */}
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {/* Color Shifts */}
+        {sectionMatches("Color Shifts") && (
+          <CollapsibleSection title="Color Shifts" defaultOpen={false}>
+            <div className="space-y-3 pt-3">
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-muted-foreground font-medium w-14 shrink-0">Hue</label>
+                <Slider
+                  value={[hueShift]}
+                  onValueChange={([v]) => setHueShift(v)}
+                  min={-180}
+                  max={180}
+                  step={1}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-10 text-right font-mono tabular-nums">
+                  {hueShift}&deg;
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-muted-foreground font-medium w-14 shrink-0">Lightness</label>
+                <Slider
+                  value={[lightnessShift]}
+                  onValueChange={([v]) => setLightnessShift(v)}
+                  min={-0.15}
+                  max={0.15}
+                  step={0.005}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-10 text-right font-mono tabular-nums">
+                  {lightnessShift > 0 ? "+" : ""}{lightnessShift}
+                </span>
+              </div>
+            </div>
+          </CollapsibleSection>
+        )}
+
         {/* Color groups — each is its own collapsible section */}
         {filteredGroups.map((group) => (
           <CollapsibleSection key={group.label} title={group.label} defaultOpen={isSearching || true}>

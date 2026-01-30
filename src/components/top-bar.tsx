@@ -4,7 +4,6 @@ import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/context/theme-context";
 import { presets } from "@/lib/presets";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { ExportDialog } from "@/components/export-dialog";
 import {
   Select,
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 export function TopBar() {
-  const { activePreset, loadPreset, previewMode, setPreviewMode, hueShift, setHueShift } = useTheme();
+  const { activePreset, loadPreset, previewMode, setPreviewMode } = useTheme();
 
   return (
     <div className="flex items-center justify-between h-14 border-b px-4 bg-background">
@@ -39,21 +38,6 @@ export function TopBar() {
             )}
           </SelectContent>
         </Select>
-
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-muted-foreground font-medium shrink-0">Hue</label>
-          <Slider
-            value={[hueShift]}
-            onValueChange={([v]) => setHueShift(v)}
-            min={-180}
-            max={180}
-            step={1}
-            className="w-28"
-          />
-          <span className="text-xs text-muted-foreground w-10 text-right font-mono tabular-nums">
-            {hueShift}&deg;
-          </span>
-        </div>
 
         <Button
           variant="outline"

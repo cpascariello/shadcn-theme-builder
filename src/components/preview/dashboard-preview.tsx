@@ -20,10 +20,13 @@ import { LoginForm } from "./login-form";
 import { DeleteDialog } from "./delete-dialog";
 import { FileUpload } from "./file-upload";
 import { FaqAccordion } from "./faq-accordion";
+import { SidebarRail } from "./sidebar-rail";
 
 export function DashboardPreview() {
   return (
-    <div className="flex-1 overflow-y-auto bg-background">
+    <div className="flex flex-1 min-h-0 bg-background">
+      <SidebarRail />
+      <div className="flex-1 overflow-y-auto">
       <div className="w-full p-6 space-y-6">
         {/* Section 1: 4-column masonry layout */}
         <div className="columns-1 md:columns-2 lg:columns-4 gap-6 [&>*]:mb-6 [&>*]:break-inside-avoid">
@@ -56,6 +59,7 @@ export function DashboardPreview() {
           <DeleteDialog />
           <FaqAccordion />
         </div>
+      </div>
       </div>
     </div>
   );

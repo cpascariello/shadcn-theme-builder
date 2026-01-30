@@ -18,6 +18,18 @@ Each entry includes:
 
 ---
 
+## Decision #12 - 2026-01-30
+**Context:** Sidebar tokens existed in presets/export but no preview component used them
+**Decision:** Add an icon rail (56px) to the left edge of the preview pane rather than a full sidebar
+**Rationale:** The preview pane already shares horizontal space with the color editor. A full nav sidebar would squeeze the masonry grid. An icon rail exercises all 8 sidebar tokens (background, foreground, primary, accent, border, ring) with minimal space cost.
+**Alternatives considered:** Full nav sidebar (too wide for available space), standalone sidebar card in masonry grid (less realistic context)
+
+## Decision #11 - 2026-01-30
+**Context:** Default theme and mode when landing on the page
+**Decision:** Changed default preset from Bubblegum to Retro, and default preview mode from light to dark
+**Rationale:** Retro dark better showcases the builder's current direction. Overrides Decision #1 (Bubblegum default).
+**Alternatives considered:** Keeping Bubblegum (no longer the focus)
+
 ## Decision #10 - 2026-01-30
 **Context:** Hue shift slider broke when user edited shadows, radius, fonts, or spacing
 **Decision:** Use `loadedTheme` (not `activePreset`) as the base for hue shifting, and only reset hue shift on manual color edits

@@ -105,3 +105,14 @@ export function shiftHue(oklch: string, degrees: number): string {
   if (h < 0) h += 360;
   return buildOklch(parsed.l, parsed.c, h);
 }
+
+/**
+ * Shift the lightness of an oklch() color by the given amount.
+ * Result is clamped to [0, 1].
+ */
+export function shiftLightness(oklch: string, amount: number): string {
+  const parsed = parseOklch(oklch);
+  if (!parsed) return oklch;
+  const l = Math.max(0, Math.min(1, parsed.l + amount));
+  return buildOklch(l, parsed.c, parsed.h);
+}

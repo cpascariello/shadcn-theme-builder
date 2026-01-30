@@ -160,8 +160,8 @@ src/
 - **Border radius:** Slider control (0–3rem, 0.125 steps)
 - **Letter spacing:** Slider control (-1 to 1em, 0.01 steps)
 - **Search:** Filter tokens and sections by name
-- **Hue shift:** Slider (-180° to +180°) rotates preset color palette hues, skips destructive/achromatic colors, survives non-color edits
-- **Presets:** Bubblegum (default), Aleph Cloud, Retro, Default, Warm, Cool, Green, High Contrast — all include sidebar colors
-- **Live preview:** Dashboard with 20 components in masonry layout, shadow tiers applied via CSS variables
+- **Color shifts:** Hue (-180° to +180°) and lightness (-0.15 to +0.15) sliders in side panel, rotate/shift preset palette, skip destructive/achromatic colors, survive non-color edits
+- **Presets:** Bubblegum, Aleph Cloud, Retro (default), Default, Warm, Cool, Green, High Contrast — all include sidebar colors
+- **Live preview:** Dashboard with 20 components in masonry layout + sidebar icon rail, shadow tiers applied via CSS variables
 - **Undo/redo:** Debounced history stack (max 50), toolbar buttons + Cmd/Ctrl+Z keyboard shortcuts, preset loads reset history
 - **Export:** Full globals.css with colors, fonts, radius, letter spacing, shadow tiers (--shadow-2xs through --shadow-2xl), sidebar colors, and @theme inline block
