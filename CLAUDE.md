@@ -160,7 +160,7 @@ src/
 - **Border radius:** Slider control (0–3rem, 0.125 steps)
 - **Letter spacing:** Slider control (-1 to 1em, 0.01 steps)
 - **Search:** Filter tokens and sections by name
-- **Presets:** Bubblegum (default), Aleph Cloud, Default, Warm, Cool, Green, High Contrast — all include sidebar colors
+- **Presets:** Bubblegum (default), Aleph Cloud, Retro, Default, Warm, Cool, Green, High Contrast — all include sidebar colors
 - **Live preview:** Dashboard with 20 components in masonry layout, shadow tiers applied via CSS variables
 - **Undo/redo:** Debounced history stack (max 50), toolbar buttons + Cmd/Ctrl+Z keyboard shortcuts, preset loads reset history
 - **Export:** Full globals.css with colors, fonts, radius, letter spacing, shadow tiers (--shadow-2xs through --shadow-2xl), sidebar colors, and @theme inline block
