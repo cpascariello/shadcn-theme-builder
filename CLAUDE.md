@@ -148,10 +148,12 @@ src/
 
 ### Current Features
 
-- **Color editing:** Light/dark mode with OKLCH color picker
+- **Color editing:** Light/dark mode with OKLCH color picker, semantic groups (Backgrounds, Text, Accents, Borders, Charts, Sidebar)
 - **Font selection:** Google Fonts (sans/serif/mono) with dynamic loading
-- **Shadow controls:** Presets (none/subtle/medium/strong/brutalist) + fine-tuning sliders
-- **Border radius:** Slider control
-- **Presets:** Bubblegum (default), Default, Warm, Cool, Green, High Contrast
-- **Live preview:** Dashboard with cards, charts, tables, component showcase
-- **Export:** Generate globals.css (pending font/shadow integration)
+- **Shadow controls:** Presets (none/subtle/medium/strong/brutalist) + fine-tuning sliders, per-mode colors (light/dark each have their own shadow color)
+- **Border radius:** Slider control (0–3rem, 0.125 steps)
+- **Letter spacing:** Slider control (-1 to 1em, 0.01 steps)
+- **Search:** Filter tokens and sections by name
+- **Presets:** Bubblegum (default), Default, Warm, Cool, Green, High Contrast — all include sidebar colors
+- **Live preview:** Dashboard with 20 components in masonry layout, shadow tiers applied via CSS variables
+- **Export:** Full globals.css with colors, fonts, radius, letter spacing, shadow tiers (--shadow-2xs through --shadow-2xl), sidebar colors, and @theme inline block

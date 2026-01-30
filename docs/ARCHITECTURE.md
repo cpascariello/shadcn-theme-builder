@@ -79,11 +79,11 @@ src/
 **Notes:** Presets load all values at once. Individual changes set `activePreset` to "custom".
 
 ### CSS Variable Injection
-**Date:** 2026-01-29
+**Date:** 2026-01-29, updated 2026-01-30
 **Context:** Need to apply theme values to preview without rebuilding Tailwind
-**Approach:** Build CSS variables object from theme state, apply as inline `style` on page container. All components use `var(--color-name)` which resolves to injected values.
+**Approach:** Two layers: (1) `buildCssVariables()` creates inline `style` on page container for colors, radius, fonts, letter spacing. (2) `buildGlobalCssOverride()` generates a `<style>` tag on `:root` with the same variables plus shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`). Tailwind shadow utilities resolve to themed values via these CSS variables.
 **Key files:** `src/app/page.tsx`, `src/app/globals.css`
-**Notes:** Shadow override uses injected `<style>` tag with `!important` to override compiled Tailwind shadow classes.
+**Notes:** Previous approach used a blunt `!important` override on `[class*="shadow"]` — replaced with proper CSS variable injection so different shadow intensities (shadow-sm vs shadow-xl) are preserved.
 
 ### Dynamic Font Loading
 **Date:** 2026-01-29
@@ -93,11 +93,11 @@ src/
 **Notes:** Fonts load weights 400, 500, 600, 700. Falls back gracefully if load fails.
 
 ### Collapsible Sections
-**Date:** 2026-01-29
+**Date:** 2026-01-29, updated 2026-01-30
 **Context:** Color editor has many controls, needs organization
-**Approach:** `CollapsibleSection` component with chevron toggle. Sections: Colors, Fonts, Radius, Shadows.
+**Approach:** `CollapsibleSection` component with bordered card UI, uppercase title, chevron toggle. Semantic color groups: Backgrounds, Text, Accents, Borders, Charts, Sidebar. Non-color sections: Fonts, Border Radius, Shadows, Letter Spacing.
 **Key files:** `src/components/color-editor.tsx`
-**Notes:** All sections default to open. Fonts/Radius/Shadows are shared across light/dark modes.
+**Notes:** All sections default open. Search bar filters by both token name and section title. Light/dark mode controlled solely by the header toggle (`previewMode`).
 
 ### Masonry Preview Layout
 **Date:** 2026-01-29
@@ -107,15 +107,15 @@ src/
 **Notes:** CSS Grid was tried first but forces equal row heights. Flex columns were unbalanced. CSS `columns` gives masonry-like packing natively.
 
 ### Global Theme Override for Portals
-**Date:** 2026-01-29
+**Date:** 2026-01-29, updated 2026-01-30
 **Context:** Radix UI portals (Select, Dialog) render at `document.body`, outside the themed container
-**Approach:** `buildGlobalCssOverride()` generates a `<style>` tag injected into the page that sets all CSS variables on `:root`. This ensures portaled content inherits theme values.
+**Approach:** `buildGlobalCssOverride()` generates a `<style>` tag injected into the page that sets all CSS variables on `:root` — colors, fonts, radius, letter spacing, and shadow tiers. This ensures portaled content inherits theme values.
 **Key files:** `src/app/page.tsx`
 **Notes:** Inline styles on the wrapper div alone are insufficient — they don't cascade to portaled elements.
 
-### Mode-Aware Shadow Colors
-**Date:** 2026-01-29
-**Context:** Shadow colors need to adapt to light/dark mode while preserving theme-specific custom colors
-**Approach:** Two neutral defaults (`SHADOW_COLOR_LIGHT`, `SHADOW_COLOR_DARK`). A `useEffect` on `previewMode` auto-swaps the shadow color only if it matches one of the two defaults. Theme-specific colors (e.g., Bubblegum pink) are preserved. Shadow preset changes only modify geometry, never color. `loadedTheme` state tracks the last loaded theme for accurate reset.
+### Per-Mode Shadow System
+**Date:** 2026-01-29, updated 2026-01-30
+**Context:** Shadow colors need to adapt to light/dark mode; shadow tiers need to be themed at runtime
+**Approach:** `ShadowConfig` stores `lightColor` and `darkColor` separately. `buildShadowTiers()` generates all 8 shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`) from the shadow config and current mode. These are injected at runtime via `buildGlobalCssOverride()`, so Tailwind shadow utilities resolve to themed values. Shadow preset changes only modify geometry, preserving user-set colors. `loadedTheme` state tracks the last loaded theme for accurate reset.
 **Key files:** `src/lib/shadow-presets.ts`, `src/context/theme-context.tsx`, `src/components/shadow-controls.tsx`
-**Notes:** `loadedTheme` is separate from `activePreset` because the latter is set to "custom" on any user tweak.
+**Notes:** `loadedTheme` is separate from `activePreset` because the latter is set to "custom" on any user tweak. Export dialog uses the same `buildShadowTiers()` for CSS output.
