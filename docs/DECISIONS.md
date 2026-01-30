@@ -18,6 +18,12 @@ Each entry includes:
 
 ---
 
+## Decision #10 - 2026-01-30
+**Context:** Hue shift slider broke when user edited shadows, radius, fonts, or spacing
+**Decision:** Use `loadedTheme` (not `activePreset`) as the base for hue shifting, and only reset hue shift on manual color edits
+**Rationale:** Non-color edits (shadows, radius, fonts, spacing) all set `activePreset` to "custom", which disabled the slider. `loadedTheme` survives customization, so the slider stays functional. Only `setColor` resets hue shift because it directly modifies colors that the slider controls.
+**Alternatives considered:** Disabling slider on any customization (original plan — too restrictive, broke on shadow edits)
+
 ## Decision #9 - 2026-01-29
 **Context:** Shadow reset needed to remember which theme was loaded
 **Decision:** Track `loadedTheme` separately from `activePreset`

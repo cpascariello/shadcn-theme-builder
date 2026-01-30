@@ -33,7 +33,7 @@ src/
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
 │   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
-│   ├── top-bar.tsx        # Header with preset selector
+│   ├── top-bar.tsx        # Header with preset selector + hue shift slider
 │   ├── export-dialog.tsx  # CSS export modal
 │   └── preview/
 │       ├── dashboard-preview.tsx    # Preview container (masonry layout)
@@ -64,7 +64,7 @@ src/
     ├── presets.ts         # Theme presets (Bubblegum, etc.)
     ├── fonts.ts           # Font options + loader
     ├── shadow-presets.ts  # Shadow presets + builder
-    ├── color-utils.ts     # OKLCH ↔ Hex conversion
+    ├── color-utils.ts     # OKLCH ↔ Hex conversion + hue shift
     └── utils.ts           # cn() helper
 ```
 
@@ -120,6 +120,13 @@ src/
 **Approach:** `ShadowConfig` stores `lightColor` and `darkColor` separately. `buildShadowTiers()` generates all 8 shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`) from the shadow config and current mode. These are injected at runtime via `buildGlobalCssOverride()`, so Tailwind shadow utilities resolve to themed values. Shadow preset changes only modify geometry, preserving user-set colors. `loadedTheme` state tracks the last loaded theme for accurate reset.
 **Key files:** `src/lib/shadow-presets.ts`, `src/context/theme-context.tsx`, `src/components/shadow-controls.tsx`
 **Notes:** `loadedTheme` is separate from `activePreset` because the latter is set to "custom" on any user tweak. Export dialog uses the same `buildShadowTiers()` for CSS output.
+
+### Hue Shift
+**Date:** 2026-01-30
+**Context:** Users want to explore color variations of a preset without manually editing every token
+**Approach:** A slider (-180° to +180°) in the top bar rotates OKLCH hue values for all color tokens. `setHueShift` always applies the shift from the original preset colors (looked up via `loadedTheme`), not cumulatively. Destructive colors and achromatic tokens (chroma < 0.001) are pinned. Shadow colors are unaffected. `hueShift` is included in `ThemeSnapshot` for undo/redo support.
+**Key files:** `src/lib/color-utils.ts`, `src/context/theme-context.tsx`, `src/components/top-bar.tsx`
+**Notes:** Uses `loadedTheme` (not `activePreset`) so the slider survives non-color edits (shadows, radius, fonts) that set `activePreset` to "custom". Manual color edits (`setColor`) reset hue shift to 0. Loading a new preset resets to 0.
 
 ### Undo/Redo History
 **Date:** 2026-01-30
