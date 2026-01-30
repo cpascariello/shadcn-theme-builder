@@ -41,18 +41,22 @@ export function ColorEditor() {
   const { previewMode, radius, setRadius, letterSpacing, setLetterSpacing } = useTheme();
   const [search, setSearch] = useState("");
 
+  const q = search.trim().toLowerCase();
+  const isSearching = q.length > 0;
+
   const filteredGroups = useMemo(() => {
-    if (!search.trim()) return COLOR_GROUPS;
-    const q = search.toLowerCase();
+    if (!isSearching) return COLOR_GROUPS;
     return COLOR_GROUPS
       .map((group) => ({
         ...group,
-        variables: group.variables.filter((v) => v.toLowerCase().includes(q)),
+        variables: group.label.toLowerCase().includes(q)
+          ? group.variables
+          : group.variables.filter((v) => v.toLowerCase().includes(q)),
       }))
-      .filter((group) => group.variables.length > 0);
-  }, [search]);
+      .filter((group) => group.variables.length > 0 || group.label.toLowerCase().includes(q));
+  }, [q, isSearching]);
 
-  const isSearching = search.trim().length > 0;
+  const sectionMatches = (title: string) => !isSearching || title.toLowerCase().includes(q);
 
   return (
     <div className="w-96 flex-shrink-0 border-r flex flex-col overflow-hidden bg-background">
@@ -82,56 +86,56 @@ export function ColorEditor() {
           </CollapsibleSection>
         ))}
 
-        {!isSearching && (
-          <>
-            {/* Fonts section */}
-            <CollapsibleSection title="Fonts" defaultOpen>
-              <div className="space-y-3">
-                <FontPicker category="sans" label="Sans" />
-                <FontPicker category="serif" label="Serif" />
-                <FontPicker category="mono" label="Mono" />
-              </div>
-            </CollapsibleSection>
+        {sectionMatches("Fonts") && (
+          <CollapsibleSection title="Fonts" defaultOpen>
+            <div className="space-y-3">
+              <FontPicker category="sans" label="Sans" />
+              <FontPicker category="serif" label="Serif" />
+              <FontPicker category="mono" label="Mono" />
+            </div>
+          </CollapsibleSection>
+        )}
 
-            {/* Border Radius section */}
-            <CollapsibleSection title="Border Radius" defaultOpen>
-              <div className="flex items-center gap-3">
-                <Slider
-                  value={[parseFloat(radius)]}
-                  onValueChange={([v]) => setRadius(`${v}rem`)}
-                  min={0}
-                  max={3}
-                  step={0.125}
-                  className="flex-1"
-                />
-                <span className="text-xs text-muted-foreground w-14 text-right font-mono">
-                  {radius}
-                </span>
-              </div>
-            </CollapsibleSection>
+        {sectionMatches("Border Radius") && (
+          <CollapsibleSection title="Border Radius" defaultOpen>
+            <div className="flex items-center gap-3">
+              <Slider
+                value={[parseFloat(radius)]}
+                onValueChange={([v]) => setRadius(`${v}rem`)}
+                min={0}
+                max={3}
+                step={0.125}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-14 text-right font-mono">
+                {radius}
+              </span>
+            </div>
+          </CollapsibleSection>
+        )}
 
-            {/* Shadows section */}
-            <CollapsibleSection title="Shadows" defaultOpen>
-              <ShadowControls />
-            </CollapsibleSection>
+        {sectionMatches("Shadows") && (
+          <CollapsibleSection title="Shadows" defaultOpen>
+            <ShadowControls />
+          </CollapsibleSection>
+        )}
 
-            {/* Letter Spacing section */}
-            <CollapsibleSection title="Letter Spacing" defaultOpen>
-              <div className="flex items-center gap-3">
-                <Slider
-                  value={[parseFloat(letterSpacing)]}
-                  onValueChange={([v]) => setLetterSpacing(`${v}em`)}
-                  min={-1}
-                  max={1}
-                  step={0.01}
-                  className="flex-1"
-                />
-                <span className="text-xs text-muted-foreground w-14 text-right font-mono">
-                  {letterSpacing}
-                </span>
-              </div>
-            </CollapsibleSection>
-          </>
+        {sectionMatches("Letter Spacing") && (
+          <CollapsibleSection title="Letter Spacing" defaultOpen>
+            <div className="flex items-center gap-3">
+              <Slider
+                value={[parseFloat(letterSpacing)]}
+                onValueChange={([v]) => setLetterSpacing(`${v}em`)}
+                min={-1}
+                max={1}
+                step={0.01}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-14 text-right font-mono">
+                {letterSpacing}
+              </span>
+            </div>
+          </CollapsibleSection>
         )}
       </div>
     </div>
