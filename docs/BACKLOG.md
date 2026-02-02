@@ -30,6 +30,11 @@ Ideas and scope creep captured for later consideration.
 **Description:** Generate theme presets from Coolors.co color palette URLs (e.g. `https://coolors.co/palette/0c0f0a-ff206e-fbff12-41ead4-ffffff`). Parse the hex colors from the URL, convert to OKLCH, and map them to theme tokens (background, foreground, primary, accent, etc.). Could be an import feature or used to expand the preset library.
 **Priority:** Medium
 
+### 2026-02-03 - Global spacing slider
+**Source:** User idea, brainstormed and designed
+**Description:** Add a slider controlling Tailwind CSS 4's `--spacing` variable to uniformly scale all component padding, margins, and gaps. Sits next to the border radius slider. Range 0.15–0.4rem, step 0.01. Design doc: `docs/plans/2026-02-03-spacing-slider-design.md`. Per-component overrides (e.g. buttons) deferred as a future extension.
+**Priority:** Medium
+
 ### 2026-01-29 - Shadow color picker: hex to OKLCH conversion
 **Source:** Identified during shadow controls testing
 **Description:** When user picks a color via the native color picker, it stores hex. Could convert to OKLCH for consistency with the rest of the theme. Currently works but mixes formats.
