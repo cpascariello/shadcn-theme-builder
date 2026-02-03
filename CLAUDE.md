@@ -158,6 +158,7 @@ src/
 - **Font selection:** Google Fonts (sans/serif/mono) with dynamic loading
 - **Shadow controls:** Presets (none/subtle/medium/strong/brutalist) + fine-tuning sliders, per-mode colors (light/dark each have their own shadow color)
 - **Border radius:** Slider control (0–3rem, 0.125 steps)
+- **Spacing:** Global spacing slider (0.15–0.4rem, 0.01 steps) controlling Tailwind CSS 4's `--spacing` base unit
 - **Letter spacing:** Slider control (-1 to 1em, 0.01 steps)
 - **Search:** Filter tokens and sections by name
 - **Color shifts:** Hue (-180° to +180°) and lightness (-0.15 to +0.15) sliders in side panel, rotate/shift preset palette, skip destructive/achromatic colors, survive non-color edits

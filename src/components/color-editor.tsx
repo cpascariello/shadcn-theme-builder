@@ -38,7 +38,7 @@ function CollapsibleSection({ title, defaultOpen = true, children }: Collapsible
 }
 
 export function ColorEditor() {
-  const { previewMode, radius, setRadius, letterSpacing, setLetterSpacing, hueShift, setHueShift, lightnessShift, setLightnessShift } = useTheme();
+  const { previewMode, radius, setRadius, spacing, setSpacing, letterSpacing, setLetterSpacing, hueShift, setHueShift, lightnessShift, setLightnessShift } = useTheme();
   const [search, setSearch] = useState("");
 
   const q = search.trim().toLowerCase();
@@ -145,6 +145,24 @@ export function ColorEditor() {
               />
               <span className="text-xs text-muted-foreground w-14 text-right font-mono">
                 {radius}
+              </span>
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {sectionMatches("Spacing") && (
+          <CollapsibleSection title="Spacing" defaultOpen>
+            <div className="flex items-center gap-3">
+              <Slider
+                value={[parseFloat(spacing)]}
+                onValueChange={([v]) => setSpacing(`${v.toFixed(2)}rem`)}
+                min={0.15}
+                max={0.4}
+                step={0.01}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-16 text-right font-mono">
+                {spacing}
               </span>
             </div>
           </CollapsibleSection>

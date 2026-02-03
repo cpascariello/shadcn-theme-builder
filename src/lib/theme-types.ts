@@ -57,6 +57,7 @@ export interface ThemeConfig {
   light: ThemeColors;
   dark: ThemeColors;
   radius: string;
+  spacing: string;
   letterSpacing: string;
   fonts: FontConfig;
   shadow: ShadowConfig;

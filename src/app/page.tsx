@@ -12,11 +12,13 @@ import { UndoRedoBar } from "@/components/undo-redo-bar";
 function buildCssVariables(
   colors: ThemeColors,
   radius: string,
+  spacing: string,
   letterSpacing: string,
   fonts: FontConfig,
 ): React.CSSProperties {
   const vars: Record<string, string> = {
     "--radius": radius,
+    "--spacing": spacing,
     "--letter-spacing": letterSpacing,
     "--font-sans": getFontStack(fonts.sans, "sans"),
     "--font-serif": getFontStack(fonts.serif, "serif"),
@@ -33,6 +35,7 @@ function buildCssVariables(
 function buildGlobalCssOverride(
   colors: ThemeColors,
   radius: string,
+  spacing: string,
   letterSpacing: string,
   fonts: FontConfig,
   shadow: ShadowConfig,
@@ -40,6 +43,7 @@ function buildGlobalCssOverride(
 ): string {
   let css = ":root {\n";
   css += `  --radius: ${radius};\n`;
+  css += `  --spacing: ${spacing};\n`;
   css += `  --letter-spacing: ${letterSpacing};\n`;
   css += `  --font-sans: ${getFontStack(fonts.sans, "sans")};\n`;
   css += `  --font-serif: ${getFontStack(fonts.serif, "serif")};\n`;
@@ -56,9 +60,9 @@ function buildGlobalCssOverride(
 }
 
 export default function Home() {
-  const { previewMode, light, dark, radius, letterSpacing, fonts, shadow } = useTheme();
+  const { previewMode, light, dark, radius, spacing, letterSpacing, fonts, shadow } = useTheme();
   const colors = previewMode === "light" ? light : dark;
-  const cssVars = buildCssVariables(colors, radius, letterSpacing, fonts);
+  const cssVars = buildCssVariables(colors, radius, spacing, letterSpacing, fonts);
   return (
     <div
       className={`flex flex-col h-screen ${previewMode === "dark" ? "dark" : ""}`}
@@ -71,7 +75,7 @@ export default function Home() {
       }}
     >
       {/* Apply theme variables to :root so portaled content (dropdowns, dialogs) inherits them */}
-      <style>{buildGlobalCssOverride(colors, radius, letterSpacing, fonts, shadow, previewMode)}</style>
+      <style>{buildGlobalCssOverride(colors, radius, spacing, letterSpacing, fonts, shadow, previewMode)}</style>
 
       {/* Fixed header */}
       <div className="flex-shrink-0">

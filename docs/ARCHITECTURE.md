@@ -83,7 +83,7 @@ src/
 ### CSS Variable Injection
 **Date:** 2026-01-29, updated 2026-01-30
 **Context:** Need to apply theme values to preview without rebuilding Tailwind
-**Approach:** Two layers: (1) `buildCssVariables()` creates inline `style` on page container for colors, radius, fonts, letter spacing. (2) `buildGlobalCssOverride()` generates a `<style>` tag on `:root` with the same variables plus shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`). Tailwind shadow utilities resolve to themed values via these CSS variables.
+**Approach:** Two layers: (1) `buildCssVariables()` creates inline `style` on page container for colors, radius, spacing, fonts, letter spacing. (2) `buildGlobalCssOverride()` generates a `<style>` tag on `:root` with the same variables plus shadow tier CSS variables (`--shadow-2xs` through `--shadow-2xl`). Tailwind shadow utilities resolve to themed values via these CSS variables. The `--spacing` variable controls Tailwind CSS 4's base spacing unit (default `0.25rem`), scaling all padding, margins, and gaps uniformly.
 **Key files:** `src/app/page.tsx`, `src/app/globals.css`
 **Notes:** Previous approach used a blunt `!important` override on `[class*="shadow"]` — replaced with proper CSS variable injection so different shadow intensities (shadow-sm vs shadow-xl) are preserved.
 

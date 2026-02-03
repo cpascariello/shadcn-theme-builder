@@ -19,6 +19,7 @@ function generateGlobalsCss(
   light: ThemeColors,
   dark: ThemeColors,
   radius: string,
+  spacing: string,
   letterSpacing: string,
   fonts: FontConfig,
   shadow: ShadowConfig,
@@ -41,7 +42,6 @@ function generateGlobalsCss(
       `${indent}--shadow-opacity: ${s.opacity.toFixed(1)};`,
       `${indent}--shadow-color: ${color};`,
       `${indent}--tracking-normal: ${letterSpacing};`,
-      `${indent}--spacing: 0.25rem;`,
       ...Object.entries(tiers).map(([key, value]) => `${indent}${key}: ${value};`),
     ];
 
@@ -54,6 +54,7 @@ function generateGlobalsCss(
 
   const formatSharedVars = (indent: string) => [
     `${indent}--radius: ${radius};`,
+    `${indent}--spacing: ${spacing};`,
     `${indent}--letter-spacing: ${letterSpacing};`,
     `${indent}--font-sans: ${sansFontStack};`,
     `${indent}--font-mono: ${monoFontStack};`,
@@ -128,10 +129,10 @@ ${formatShadowVars(shadow, "dark", "  ")}
 }
 
 export function ExportDialog() {
-  const { light, dark, radius, letterSpacing, fonts, shadow } = useTheme();
+  const { light, dark, radius, spacing, letterSpacing, fonts, shadow } = useTheme();
   const [copied, setCopied] = useState(false);
 
-  const css = generateGlobalsCss(light, dark, radius, letterSpacing, fonts, shadow);
+  const css = generateGlobalsCss(light, dark, radius, spacing, letterSpacing, fonts, shadow);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(css);

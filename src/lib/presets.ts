@@ -73,6 +73,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.2713 0.0086 255.5780)",
     },
     radius: "0.4rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -162,6 +163,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.4280 0.2490 285.6020)",
     },
     radius: "1rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Titillium Web",
@@ -251,6 +253,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.3502 0.0772 230.2063)",
     },
     radius: "0rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -340,6 +343,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.645 0.246 16.439)",
     },
     radius: "0.625rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -429,6 +433,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.645 0.246 16.439)",
     },
     radius: "0.625rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -518,6 +523,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.645 0.246 16.439)",
     },
     radius: "0.625rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -607,6 +613,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.645 0.246 16.439)",
     },
     radius: "0.625rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",
@@ -696,6 +703,7 @@ export const presets: ThemeConfig[] = [
       "chart-5": "oklch(0.65 0.24 310)",
     },
     radius: "0.625rem",
+    spacing: "0.25rem",
     letterSpacing: "0em",
     fonts: {
       sans: "Inter",

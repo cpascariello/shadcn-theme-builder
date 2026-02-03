@@ -11,6 +11,7 @@ interface ThemeSnapshot {
   light: ThemeColors;
   dark: ThemeColors;
   radius: string;
+  spacing: string;
   letterSpacing: string;
   fonts: FontConfig;
   shadow: ShadowConfig;
@@ -24,6 +25,7 @@ interface ThemeContextValue {
   light: ThemeColors;
   dark: ThemeColors;
   radius: string;
+  spacing: string;
   letterSpacing: string;
   previewMode: "light" | "dark";
   activePreset: string;
@@ -33,6 +35,7 @@ interface ThemeContextValue {
 
   setColor: (mode: "light" | "dark", key: keyof ThemeColors, value: string) => void;
   setRadius: (radius: string) => void;
+  setSpacing: (value: string) => void;
   setLetterSpacing: (value: string) => void;
   setPreviewMode: (mode: "light" | "dark") => void;
   loadPreset: (presetName: string) => void;
@@ -64,6 +67,7 @@ const initialSnapshot: ThemeSnapshot = {
   light: defaultPreset.light,
   dark: defaultPreset.dark,
   radius: defaultPreset.radius,
+  spacing: defaultPreset.spacing,
   letterSpacing: defaultPreset.letterSpacing,
   fonts: defaultPreset.fonts,
   shadow: defaultPreset.shadow,
@@ -91,6 +95,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [light, setLight] = useState<ThemeColors>(defaultPreset.light);
   const [dark, setDark] = useState<ThemeColors>(defaultPreset.dark);
   const [radius, setRadiusState] = useState(defaultPreset.radius);
+  const [spacing, setSpacingState] = useState(defaultPreset.spacing);
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("dark");
   const [activePreset, setActivePreset] = useState(defaultPreset.name);
   // Tracks which theme was last loaded via loadPreset — survives customization
@@ -130,9 +135,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const currentSnapshotRef = useRef<ThemeSnapshot>(initialSnapshot);
   useEffect(() => {
     currentSnapshotRef.current = {
-      light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift,
+      light, dark, radius, spacing, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift,
     };
-  }, [light, dark, radius, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift]);
+  }, [light, dark, radius, spacing, letterSpacing, fonts, shadow, shadowPreset, activePreset, hueShift, lightnessShift]);
 
   // Debounced push: captures post-mutation state after 300ms settle
   const pushHistory = useCallback(() => {
@@ -158,6 +163,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setLight(snapshot.light);
     setDark(snapshot.dark);
     setRadiusState(snapshot.radius);
+    setSpacingState(snapshot.spacing);
     setLetterSpacingState(snapshot.letterSpacing);
     setFonts(snapshot.fonts);
     setShadowState(snapshot.shadow);
@@ -244,6 +250,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setActivePreset("custom");
   }, [pushHistory]);
 
+  const setSpacing = useCallback((value: string) => {
+    if (!isRestoringRef.current) pushHistory();
+    setSpacingState(value);
+    setActivePreset("custom");
+  }, [pushHistory]);
+
   const setLetterSpacing = useCallback((value: string) => {
     if (!isRestoringRef.current) pushHistory();
     setLetterSpacingState(value);
@@ -291,6 +303,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setLight(preset.light);
       setDark(preset.dark);
       setRadiusState(preset.radius);
+      setSpacingState(preset.spacing);
       setLetterSpacingState(preset.letterSpacing);
       setFonts(preset.fonts);
       setShadowState(preset.shadow);
@@ -305,6 +318,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         light: preset.light,
         dark: preset.dark,
         radius: preset.radius,
+        spacing: preset.spacing,
         letterSpacing: preset.letterSpacing,
         fonts: preset.fonts,
         shadow: preset.shadow,
@@ -354,6 +368,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         light,
         dark,
         radius,
+        spacing,
         letterSpacing,
         previewMode,
         activePreset,
@@ -362,6 +377,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         shadowPreset,
         setColor,
         setRadius,
+        setSpacing,
         setLetterSpacing,
         setPreviewMode,
         loadPreset,
