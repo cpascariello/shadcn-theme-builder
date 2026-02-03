@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from "react";
-import { ThemeColors, FontConfig, ShadowConfig, ShadowPreset } from "@/lib/theme-types";
+import { ThemeColors, ThemeConfig, FontConfig, ShadowConfig, ShadowPreset } from "@/lib/theme-types";
 import { presets } from "@/lib/presets";
 import { loadGoogleFont } from "@/lib/fonts";
 import { SHADOW_PRESETS } from "@/lib/shadow-presets";
@@ -39,6 +39,8 @@ interface ThemeContextValue {
   setLetterSpacing: (value: string) => void;
   setPreviewMode: (mode: "light" | "dark") => void;
   loadPreset: (presetName: string) => void;
+  loadThemeConfig: (config: ThemeConfig) => void;
+  getThemeConfig: (name: string, label: string) => ThemeConfig;
   setFont: (category: keyof FontConfig, font: string) => void;
   setShadow: (updates: Partial<ShadowConfig>) => void;
   setShadowPreset: (preset: ShadowPreset) => void;
@@ -98,8 +100,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [spacing, setSpacingState] = useState(defaultPreset.spacing);
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("dark");
   const [activePreset, setActivePreset] = useState(defaultPreset.name);
-  // Tracks which theme was last loaded via loadPreset — survives customization
-  const [loadedTheme, setLoadedTheme] = useState(defaultPreset.name);
+  // Tracks the full config of the last loaded theme — survives customization.
+  // Used by hue/lightness shift and resetShadow to reference base colors.
+  const [loadedThemeConfig, setLoadedThemeConfig] = useState<ThemeConfig>(defaultPreset);
   const [fonts, setFonts] = useState<FontConfig>(defaultPreset.fonts);
   const [letterSpacing, setLetterSpacingState] = useState(defaultPreset.letterSpacing);
   const [shadow, setShadowState] = useState<ShadowConfig>(defaultPreset.shadow);
@@ -291,10 +294,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const resetShadow = useCallback(() => {
     if (!isRestoringRef.current) pushHistory();
-    const themePreset = presets.find((p) => p.name === loadedTheme) ?? presets[0];
-    setShadowState(themePreset.shadow);
-    setShadowPresetState(themePreset.shadowPreset);
-  }, [loadedTheme, pushHistory]);
+    setShadowState(loadedThemeConfig.shadow);
+    setShadowPresetState(loadedThemeConfig.shadowPreset);
+  }, [loadedThemeConfig, pushHistory]);
 
   const loadPreset = useCallback((presetName: string) => {
     const preset = presets.find((p) => p.name === presetName);
@@ -309,7 +311,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setShadowState(preset.shadow);
       setShadowPresetState(preset.shadowPreset);
       setActivePreset(preset.name);
-      setLoadedTheme(preset.name);
+      setLoadedThemeConfig(preset);
       setHueShiftState(0);
       setLightnessShiftState(0);
 
@@ -339,25 +341,62 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const loadThemeConfig = useCallback((config: ThemeConfig) => {
+    isRestoringRef.current = true;
+    setLight(config.light);
+    setDark(config.dark);
+    setRadiusState(config.radius);
+    setSpacingState(config.spacing);
+    setLetterSpacingState(config.letterSpacing);
+    setFonts(config.fonts);
+    setShadowState(config.shadow);
+    setShadowPresetState(config.shadowPreset);
+    setActivePreset(config.name);
+    setLoadedThemeConfig(config);
+    setHueShiftState(0);
+    setLightnessShiftState(0);
+
+    const snapshot: ThemeSnapshot = {
+      light: config.light,
+      dark: config.dark,
+      radius: config.radius,
+      spacing: config.spacing,
+      letterSpacing: config.letterSpacing,
+      fonts: config.fonts,
+      shadow: config.shadow,
+      shadowPreset: config.shadowPreset,
+      activePreset: config.name,
+      hueShift: 0,
+      lightnessShift: 0,
+    };
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    setHistory([snapshot]);
+    setHistoryIndex(0);
+    setRestoringFlag(true);
+  }, []);
+
+  const getThemeConfig = useCallback((name: string, label: string): ThemeConfig => {
+    return { name, label, light, dark, radius, spacing, letterSpacing, fonts, shadow, shadowPreset };
+  }, [light, dark, radius, spacing, letterSpacing, fonts, shadow, shadowPreset]);
+
   const setHueShift = useCallback((degrees: number) => {
-    const preset = presets.find((p) => p.name === loadedTheme);
-    if (!preset) return;
     if (!isRestoringRef.current) pushHistory();
     const ls = currentSnapshotRef.current.lightnessShift;
-    setLight(applyColorShifts(preset.light, degrees, ls));
-    setDark(applyColorShifts(preset.dark, degrees, ls));
+    setLight(applyColorShifts(loadedThemeConfig.light, degrees, ls));
+    setDark(applyColorShifts(loadedThemeConfig.dark, degrees, ls));
     setHueShiftState(degrees);
-  }, [loadedTheme, pushHistory]);
+  }, [loadedThemeConfig, pushHistory]);
 
   const setLightnessShift = useCallback((amount: number) => {
-    const preset = presets.find((p) => p.name === loadedTheme);
-    if (!preset) return;
     if (!isRestoringRef.current) pushHistory();
     const hs = currentSnapshotRef.current.hueShift;
-    setLight(applyColorShifts(preset.light, hs, amount));
-    setDark(applyColorShifts(preset.dark, hs, amount));
+    setLight(applyColorShifts(loadedThemeConfig.light, hs, amount));
+    setDark(applyColorShifts(loadedThemeConfig.dark, hs, amount));
     setLightnessShiftState(amount);
-  }, [loadedTheme, pushHistory]);
+  }, [loadedThemeConfig, pushHistory]);
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -381,6 +420,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setLetterSpacing,
         setPreviewMode,
         loadPreset,
+        loadThemeConfig,
+        getThemeConfig,
         setFont,
         setShadow,
         setShadowPreset,

@@ -20,11 +20,6 @@ Ideas and scope creep captured for later consideration.
 **Description:** Allow users to paste globals.css from other shadcn theme builders (e.g. tinte.dev, ui.shadcn.com) and have the builder parse the CSS variables into a live theme. Would need to extract OKLCH/hex color values, radius, fonts, shadows, etc. from `:root` and `.dark` blocks.
 **Priority:** Medium
 
-### 2026-01-30 - Save custom themes
-**Source:** User idea
-**Description:** Allow users to save their customized themes locally (e.g. localStorage) and reload them later. Could include naming, listing saved themes, and deleting them.
-**Priority:** Medium
-
 ### 2026-01-30 - Create themes from Coolors.co palettes
 **Source:** User idea
 **Description:** Generate theme presets from Coolors.co color palette URLs (e.g. `https://coolors.co/palette/0c0f0a-ff206e-fbff12-41ead4-ffffff`). Parse the hex colors from the URL, convert to OKLCH, and map them to theme tokens (background, foreground, primary, accent, etc.). Could be an import feature or used to expand the preset library.
@@ -48,6 +43,10 @@ Ideas and scope creep captured for later consideration.
 ### 2026-02-03 - Shadow color picker: hex to OKLCH conversion ✅
 **Source:** Identified during shadow controls testing
 **Completed:** Native color picker now converts hex to OKLCH via `hexToOklch()` before storing, keeping shadow colors consistent with all other theme values.
+
+### 2026-02-03 - Save custom themes ✅
+**Source:** User idea
+**Completed:** Save/load/delete custom themes via localStorage. Floppy disk icon button opens name input popover with overwrite confirmation. Saved themes appear in "My Themes" section of the preset dropdown with inline delete (two-click confirm). Also fixed: `loadedTheme` replaced with `loadedThemeConfig` (full ThemeConfig) so hue/lightness shifts and shadow reset work correctly with saved themes.
 
 ### 2026-02-03 - Global spacing slider ✅
 **Source:** User idea, brainstormed and designed

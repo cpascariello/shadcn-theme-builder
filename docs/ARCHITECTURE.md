@@ -33,7 +33,7 @@ src/
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
 │   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
-│   ├── top-bar.tsx        # Header with preset selector + mode toggle
+│   ├── top-bar.tsx        # Header with preset selector, save button + mode toggle
 │   ├── export-dialog.tsx  # CSS export modal
 │   └── preview/
 │       ├── dashboard-preview.tsx    # Preview container (masonry layout)
@@ -58,6 +58,8 @@ src/
 │       ├── file-upload.tsx          # Upload dropzone
 │       ├── faq-accordion.tsx        # Accordion FAQ
 │       └── sidebar-rail.tsx         # Icon rail sidebar (exercises --sidebar-* tokens)
+├── hooks/
+│   └── use-saved-themes.ts # localStorage CRUD for saved themes
 ├── context/
 │   └── theme-context.tsx  # All theme state + setters + undo/redo history
 └── lib/
@@ -142,3 +144,10 @@ src/
 **Approach:** `ThemeProvider` maintains a history stack (max 50 `ThemeSnapshot` entries) and an index pointer. Every setter calls a debounced (300ms) `pushHistory()` before mutating, so slider drags and rapid color picks coalesce into one entry. `undo()`/`redo()` apply snapshots via `applySnapshot()`, guarded by `isRestoringRef` to prevent recursive pushes. Keyboard shortcuts (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z, Cmd/Ctrl+Y) are registered in a `useEffect`. Loading a preset resets history to a single entry.
 **Key files:** `src/context/theme-context.tsx`, `src/components/undo-redo-bar.tsx`, `src/app/page.tsx`
 **Notes:** Refs (`historyRef`, `historyIndexRef`, `currentSnapshotRef`) mirror state to avoid stale closures in the debounced callback. `previewMode` is intentionally excluded from snapshots — it's a view toggle, not a theme edit.
+
+### Saved Themes (localStorage)
+**Date:** 2026-02-03
+**Context:** Users want to save and reload custom themes across sessions
+**Approach:** `useSavedThemes()` hook manages a JSON array of `ThemeConfig` objects in localStorage under `shadcn-theme-builder-saved`. Save button (floppy disk icon) in the top bar opens a popover with name input. Saved themes appear in a "My Themes" section in the preset dropdown with inline delete (two-click confirm). Loading a saved theme uses `loadThemeConfig()` which accepts a `ThemeConfig` directly.
+**Key files:** `src/hooks/use-saved-themes.ts`, `src/components/top-bar.tsx`, `src/context/theme-context.tsx`
+**Notes:** `loadedTheme` (string) was replaced with `loadedThemeConfig` (full `ThemeConfig`) so that hue/lightness shifts and shadow reset work correctly with saved themes — they reference the stored config directly instead of looking up from the built-in presets array.
