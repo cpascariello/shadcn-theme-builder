@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/theme-context";
 import { ShadowPreset } from "@/lib/theme-types";
-import { oklchToHex } from "@/lib/color-utils";
+import { oklchToHex, hexToOklch } from "@/lib/color-utils";
 import { RotateCcw } from "lucide-react";
 
 const PRESET_OPTIONS: { value: ShadowPreset; label: string }[] = [
@@ -152,7 +152,7 @@ function ShadowColorPicker() {
     : oklchToHex(color) || "#000000";
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShadow({ [colorKey]: e.target.value });
+    setShadow({ [colorKey]: hexToOklch(e.target.value) });
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
