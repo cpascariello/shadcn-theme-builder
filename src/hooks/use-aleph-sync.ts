@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { fetchThemesFromAleph, pushThemesToAleph } from "@/lib/aleph";
+import { fetchThemesFromAleph, pushThemesToAleph, deleteThemeFromAleph } from "@/lib/aleph";
 import type { ThemeConfig } from "@/lib/theme-types";
 
 type ChainNamespace = "eip155" | "solana";
@@ -56,10 +56,39 @@ export function useAlephSync() {
       setIsSyncing(true);
       setLastSyncError(null);
       try {
-        await pushThemesToAleph(themes, address, chain, provider);
-        setRemoteThemes(themes);
+        // Merge local themes into existing cloud themes (local wins on conflict)
+        const map = new Map((remoteThemes ?? []).map((t) => [t.name, t]));
+        for (const t of themes) map.set(t.name, t);
+        const merged = Array.from(map.values());
+        await pushThemesToAleph(merged, address, chain, provider);
+        setRemoteThemes(merged);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to push themes";
+        setLastSyncError(msg);
+        throw err;
+      } finally {
+        setIsSyncing(false);
+      }
+    },
+    [address, chain, eip155Provider, solanaProvider, remoteThemes],
+  );
+
+  const deleteFromAleph = useCallback(
+    async (themeName: string): Promise<void> => {
+      if (!address || !chain) {
+        throw new Error("Wallet not connected");
+      }
+      const provider = chain === "eip155" ? eip155Provider : solanaProvider;
+      if (!provider) {
+        throw new Error("No wallet provider available");
+      }
+      setIsSyncing(true);
+      setLastSyncError(null);
+      try {
+        const remaining = await deleteThemeFromAleph(themeName, address, chain, provider);
+        setRemoteThemes(remaining.length > 0 ? remaining : null);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to delete theme";
         setLastSyncError(msg);
         throw err;
       } finally {
@@ -90,5 +119,6 @@ export function useAlephSync() {
     remoteThemes,
     pushToAleph,
     pullFromAleph,
+    deleteFromAleph,
   };
 }

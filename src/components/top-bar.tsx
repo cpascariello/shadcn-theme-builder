@@ -18,14 +18,16 @@ import {
 
 export function TopBar() {
   const { activePreset, loadPreset, loadThemeConfig, getThemeConfig, previewMode, setPreviewMode } = useTheme();
-  const { savedThemes, save, remove, exists } = useSavedThemes();
-  const { isConnected, address, isSyncing, remoteThemes, pushToAleph } = useAlephSync();
+  const { savedThemes, save, remove, clear, exists } = useSavedThemes();
+  const { isConnected, address, isSyncing, remoteThemes, pushToAleph, deleteFromAleph } = useAlephSync();
   const [presetOpen, setPresetOpen] = useState(false);
   const [pushing, setPushing] = useState(false);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [confirmOverwrite, setConfirmOverwrite] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmCloudDelete, setConfirmCloudDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const cloudOnly = useMemo(() => {
     if (!remoteThemes) return [];
@@ -55,6 +57,7 @@ export function TopBar() {
     setPushing(true);
     try {
       await pushToAleph(savedThemes);
+      clear();
     } catch {
       // error is surfaced via lastSyncError in the hook
     } finally {
@@ -92,7 +95,7 @@ export function TopBar() {
 
       <div className="flex items-center gap-2">
         {/* Preset dropdown */}
-        <Popover open={presetOpen} onOpenChange={(open) => { setPresetOpen(open); if (!open) setConfirmDelete(null); }}>
+        <Popover open={presetOpen} onOpenChange={(open) => { setPresetOpen(open); if (!open) { setConfirmDelete(null); setConfirmCloudDelete(null); } }}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="min-w-36 justify-between">
               {activeLabel}
@@ -177,19 +180,50 @@ export function TopBar() {
                   Cloud Themes
                 </div>
                 {cloudOnly.map((theme) => (
-                  <button
+                  <div
                     key={theme.name}
-                    onClick={() => {
-                      loadThemeConfig(theme);
-                      setPresetOpen(false);
-                    }}
-                    className={`flex items-center w-full px-3 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors ${
+                    className={`flex items-center group rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors ${
                       activePreset === theme.name ? "bg-accent text-accent-foreground" : ""
                     }`}
                   >
-                    <Cloud className="h-3.5 w-3.5 mr-2 opacity-50 shrink-0" />
-                    {theme.label}
-                  </button>
+                    <button
+                      onClick={() => {
+                        loadThemeConfig(theme);
+                        setPresetOpen(false);
+                      }}
+                      className="flex-1 flex items-center text-left px-3 py-1.5 text-sm"
+                    >
+                      <Cloud className="h-3.5 w-3.5 mr-2 opacity-50 shrink-0" />
+                      {theme.label}
+                    </button>
+                    {confirmCloudDelete === theme.name ? (
+                      <button
+                        disabled={deleting}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setDeleting(true);
+                          try {
+                            await deleteFromAleph(theme.name);
+                          } catch { /* error surfaced via hook */ }
+                          setDeleting(false);
+                          setConfirmCloudDelete(null);
+                        }}
+                        className="px-2 py-1.5 rounded-sm text-xs text-destructive font-medium bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                      >
+                        {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Delete?"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmCloudDelete(theme.name);
+                        }}
+                        className="px-2 py-1.5 rounded-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </>
             )}
@@ -240,19 +274,20 @@ export function TopBar() {
         </Popover>
 
         {/* Push to Aleph */}
-        <Button
-          variant="outline"
-          size="icon"
-          title="Push saved themes to Aleph Cloud"
-          onClick={handlePush}
-          disabled={!isConnected || !hasUnpushedChanges || pushing}
-        >
-          {pushing ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <CloudUpload className="size-4" />
-          )}
-        </Button>
+        <span title={!isConnected || !hasUnpushedChanges ? "First save a theme then push to Aleph Cloud" : "Push saved themes to Aleph Cloud"}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePush}
+            disabled={!isConnected || !hasUnpushedChanges || pushing}
+          >
+            {pushing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <CloudUpload className="size-4" />
+            )}
+          </Button>
+        </span>
 
         {/* Light/dark toggle */}
         <Button

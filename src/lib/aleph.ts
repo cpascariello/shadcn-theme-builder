@@ -17,20 +17,35 @@ export async function fetchThemesFromAleph(
       address,
       AGGREGATE_KEY,
     );
-    return data?.themes ?? null;
+    if (!data) return null;
+    const record = data as unknown as Record<string, unknown>;
+    // Collect from all sources, dedup by name (themes array wins over per-key)
+    const map = new Map<string, ThemeConfig>();
+    // Per-key entries (intermediate format) — add first so themes array overwrites
+    for (const [key, value] of Object.entries(record)) {
+      if (key === "themes") continue;
+      if (value && typeof value === "object" && "name" in value) {
+        const t = value as ThemeConfig;
+        map.set(t.name, t);
+      }
+    }
+    // themes array (primary format) — overwrites per-key on conflict
+    if (Array.isArray(record.themes)) {
+      for (const t of record.themes as ThemeConfig[]) {
+        map.set(t.name, t);
+      }
+    }
+    return map.size > 0 ? Array.from(map.values()) : null;
   } catch {
     // No aggregate found for this address
     return null;
   }
 }
 
-export async function pushThemesToAleph(
-  themes: ThemeConfig[],
-  address: string,
-  chainNamespace: "eip155" | "solana",
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  provider: any,
-): Promise<void> {
+type ChainNamespace = "eip155" | "solana";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getAlephClient(chainNamespace: ChainNamespace, provider: any) {
   const { AuthenticatedAlephHttpClient } = await import("@aleph-sdk/client");
 
   let account;
@@ -42,7 +57,6 @@ export async function pushThemesToAleph(
     account = await getAccountFromProvider(web3Provider);
   } else {
     const { getAccountFromProvider } = await import("@aleph-sdk/solana");
-    // Reown's Solana provider needs wrapping for Aleph SDK's MessageSigner
     const solanaProvider = {
       publicKey: provider.publicKey,
       connected: true,
@@ -54,10 +68,43 @@ export async function pushThemesToAleph(
     account = await getAccountFromProvider(solanaProvider);
   }
 
-  const client = new AuthenticatedAlephHttpClient(account);
+  return new AuthenticatedAlephHttpClient(account);
+}
+
+async function pushAggregate(
+  themes: ThemeConfig[],
+  chainNamespace: ChainNamespace,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  provider: any,
+) {
+  const client = await getAlephClient(chainNamespace, provider);
   await client.createAggregate({
     key: AGGREGATE_KEY,
     content: { themes } satisfies AggregateContent,
     channel: CHANNEL,
   });
+}
+
+export async function pushThemesToAleph(
+  themes: ThemeConfig[],
+  address: string,
+  chainNamespace: ChainNamespace,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  provider: any,
+): Promise<void> {
+  await pushAggregate(themes, chainNamespace, provider);
+}
+
+export async function deleteThemeFromAleph(
+  themeName: string,
+  address: string,
+  chainNamespace: ChainNamespace,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  provider: any,
+): Promise<ThemeConfig[]> {
+  // Fetch current snapshot, remove the theme, push the full new snapshot
+  const current = await fetchThemesFromAleph(address) ?? [];
+  const next = current.filter((t) => t.name !== themeName);
+  await pushAggregate(next, chainNamespace, provider);
+  return next;
 }

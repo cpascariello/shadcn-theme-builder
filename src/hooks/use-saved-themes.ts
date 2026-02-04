@@ -52,6 +52,11 @@ export function useSavedThemes() {
     return readFromStorage().some((t) => t.name === name);
   }, []);
 
+  const clear = useCallback(() => {
+    writeToStorage([]);
+    setSavedThemes([]);
+  }, []);
+
   const saveAll = useCallback((themes: ThemeConfig[]) => {
     const current = readFromStorage();
     let next = [...current];
@@ -67,5 +72,5 @@ export function useSavedThemes() {
     setSavedThemes(next);
   }, []);
 
-  return { savedThemes, save, saveAll, remove, exists };
+  return { savedThemes, save, saveAll, remove, clear, exists };
 }
