@@ -50,7 +50,7 @@ Ideas and scope creep captured for later consideration.
 
 ### 2026-02-04 - Aleph Cloud sync with Reown wallet ✅
 **Source:** User idea, planned and implemented
-**Completed:** Save/load themes to Aleph.im aggregate messages via Reown AppKit wallet connection (ETH + SOL). Auto-pulls on connect, push button syncs local themes to cloud. Preset dropdown shows "Cloud Themes" section for remote-only themes. Push button disabled when local matches remote.
+**Completed:** Save/load themes to Aleph.im aggregate messages via Reown AppKit wallet connection (ETH + SOL). Auto-pulls on connect, push merges local into cloud and auto-clears localStorage. Cloud themes deletable with two-click confirm. Push button shows helpful tooltip when disabled. Aggregate uses single `themes` array key for clean snapshots.
 
 ### 2026-02-03 - Global spacing slider ✅
 **Source:** User idea, brainstormed and designed

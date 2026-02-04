@@ -18,6 +18,18 @@ Each entry includes:
 
 ---
 
+## Decision #16 - 2026-02-04
+**Context:** Aleph aggregate format for storing themes
+**Decision:** Single `themes` array key with full snapshot writes, after trying per-key format
+**Rationale:** Per-key format (`{ [themeName]: ThemeConfig }`) leverages Aleph's key-level merge but leaves stale null keys on delete that accumulate forever. A single `themes` array means every push/delete writes a clean snapshot — no stale keys. The tradeoff is client-side merge on push (to preserve existing cloud themes not in localStorage), which is straightforward.
+**Alternatives considered:** Per-key format with null tombstones (stale key accumulation), per-key format without delete (no way to remove themes)
+
+## Decision #15 - 2026-02-04
+**Context:** UX for local vs cloud themes after pushing to Aleph
+**Decision:** Auto-remove local themes from localStorage after successful cloud push
+**Rationale:** Having the same theme in both "My Themes" and "Cloud Themes" is confusing — users don't understand why they need to manually delete the local copy after pushing. Clearing localStorage after push moves themes cleanly to "Cloud Themes" section.
+**Alternatives considered:** Keep both copies (confusing UX, requires manual cleanup)
+
 ## Decision #14 - 2026-02-04
 **Context:** Wallet connect button in the top bar
 **Decision:** Use a native shadcn Button that calls `appKit.open()` instead of the `<appkit-button>` web component

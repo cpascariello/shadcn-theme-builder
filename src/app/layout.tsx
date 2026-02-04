@@ -14,9 +14,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://themer.stasho.xyz";
+const title = "shadcn Theme Builder — Powered by Aleph Cloud";
+const description =
+  "Visual shadcn/ui theme editor hosted on Aleph Cloud. Save and sync themes as Aleph aggregate messages with wallet-based authentication. Decentralized hosting, decentralized storage.";
+
 export const metadata: Metadata = {
-  title: "shadcn Theme Builder",
-  description: "Build and export custom shadcn/ui themes",
+  title,
+  description,
+  metadataBase: new URL(siteUrl),
+  keywords: [
+    "aleph cloud",
+    "aleph.im",
+    "aleph aggregate",
+    "decentralized hosting",
+    "decentralized storage",
+    "shadcn",
+    "shadcn/ui",
+    "theme builder",
+    "tailwind css",
+    "web3",
+    "wallet authentication",
+    "oklch",
+  ],
+  authors: [{ name: "Stasho" }],
+  openGraph: {
+    title,
+    description,
+    url: siteUrl,
+    siteName: "shadcn Theme Builder",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
