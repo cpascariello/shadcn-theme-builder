@@ -59,7 +59,7 @@ interface ThemeContextValue {
 
 const HISTORY_MAX = 50;
 
-const defaultPreset = presets.find((p) => p.name === "retro") ?? presets[0];
+const defaultPreset = presets.find((p) => p.name === "aleph-cloud") ?? presets[0];
 
 // Hoisted to module scope — defaultPreset is a constant, no need to recreate per render.
 // loadedTheme is intentionally excluded: loadPreset resets history, so loadedTheme

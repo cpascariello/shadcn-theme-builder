@@ -33,7 +33,8 @@ src/
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
 │   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
-│   ├── top-bar.tsx        # Header with preset selector, save button + mode toggle
+│   ├── top-bar.tsx        # Header with preset selector, save, cloud push, wallet connect
+│   ├── wallet-provider.tsx # WagmiProvider + QueryClientProvider wrapper
 │   ├── export-dialog.tsx  # CSS export modal
 │   └── preview/
 │       ├── dashboard-preview.tsx    # Preview container (masonry layout)
@@ -59,7 +60,8 @@ src/
 │       ├── faq-accordion.tsx        # Accordion FAQ
 │       └── sidebar-rail.tsx         # Icon rail sidebar (exercises --sidebar-* tokens)
 ├── hooks/
-│   └── use-saved-themes.ts # localStorage CRUD for saved themes
+│   ├── use-saved-themes.ts  # localStorage CRUD for saved themes
+│   └── use-aleph-sync.ts   # Aleph aggregate read/write via Reown wallet
 ├── context/
 │   └── theme-context.tsx  # All theme state + setters + undo/redo history
 └── lib/
@@ -68,6 +70,8 @@ src/
     ├── fonts.ts           # Font options + loader
     ├── shadow-presets.ts  # Shadow presets + builder
     ├── color-utils.ts     # OKLCH ↔ Hex conversion + hue/lightness shift
+    ├── reown-config.ts    # Reown AppKit setup (Wagmi + Solana adapters)
+    ├── aleph.ts           # Aleph SDK aggregate read/write functions
     └── utils.ts           # cn() helper
 ```
 
@@ -151,3 +155,10 @@ src/
 **Approach:** `useSavedThemes()` hook manages a JSON array of `ThemeConfig` objects in localStorage under `shadcn-theme-builder-saved`. Save button (floppy disk icon) in the top bar opens a popover with name input. Saved themes appear in a "My Themes" section in the preset dropdown with inline delete (two-click confirm). Loading a saved theme uses `loadThemeConfig()` which accepts a `ThemeConfig` directly.
 **Key files:** `src/hooks/use-saved-themes.ts`, `src/components/top-bar.tsx`, `src/context/theme-context.tsx`
 **Notes:** `loadedTheme` (string) was replaced with `loadedThemeConfig` (full `ThemeConfig`) so that hue/lightness shifts and shadow reset work correctly with saved themes — they reference the stored config directly instead of looking up from the built-in presets array.
+
+### Aleph Cloud Sync (Wallet-Connected Storage)
+**Date:** 2026-02-04
+**Context:** Users want to sync saved themes across devices via decentralized storage
+**Approach:** Reown AppKit provides wallet connection (ETH + SOL) via `createAppKit()` with `WagmiAdapter` and `SolanaAdapter`. `WalletProvider` wraps the app with `WagmiProvider` + `QueryClientProvider`. Aleph SDK reads/writes theme data as aggregate messages (key: `shadcn-theme-builder-themes`, channel: `shadcn-theme-builder`). Reads are free (no signing), writes trigger a wallet signature popup. `useAlephSync()` hook auto-pulls on wallet connect and exposes `pushToAleph`/`pullFromAleph`. The preset dropdown shows three sections: built-in presets, "My Themes" (local), and "Cloud Themes" (remote-only). Push button is disabled when local themes match remote.
+**Key files:** `src/lib/reown-config.ts`, `src/lib/aleph.ts`, `src/hooks/use-aleph-sync.ts`, `src/components/wallet-provider.tsx`, `src/components/top-bar.tsx`
+**Notes:** Dynamic imports for Aleph SDK and ethers5 keep the main bundle small. Chain detection uses CAIP address prefix (`eip155:` vs `solana:`). Solana provider needs wrapping into `{ publicKey, signMessage, connected, connect }` for Aleph SDK's `getAccountFromProvider()`. ethers5 is aliased (`ethers5@npm:ethers@^5.7.2`) to avoid v6 conflicts.

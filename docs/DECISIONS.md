@@ -18,6 +18,18 @@ Each entry includes:
 
 ---
 
+## Decision #14 - 2026-02-04
+**Context:** Wallet connect button in the top bar
+**Decision:** Use a native shadcn Button that calls `appKit.open()` instead of the `<appkit-button>` web component
+**Rationale:** The Reown web component has SSR hydration issues in Next.js 16 (renders unstyled, disappears on click). A native button is consistent with the rest of the UI and avoids web component lifecycle problems. Shows a Wallet icon when disconnected, icon + truncated address when connected.
+**Alternatives considered:** `<appkit-button>` web component (SSR issues), `useAppKit()` hook (requires `createAppKit` to run before any render, fails during static prerendering)
+
+## Decision #13 - 2026-02-04
+**Context:** Choosing decentralized storage for cross-device theme sync
+**Decision:** Aleph.im aggregate messages with Reown AppKit for wallet connection (ETH + SOL)
+**Rationale:** Aggregates are key-value storage tied to a wallet address — reads are free (no signing), writes require a one-time signature. Same `ThemeConfig` shape as localStorage, no conversion needed. Reown AppKit handles both Ethereum and Solana wallets with a single modal.
+**Alternatives considered:** IPFS (no key-value semantics), centralized backend (requires auth infrastructure), on-chain storage (expensive, overkill)
+
 ## Decision #12 - 2026-01-30
 **Context:** Sidebar tokens existed in presets/export but no preview component used them
 **Decision:** Add an icon rail (56px) to the left edge of the preview pane rather than a full sidebar

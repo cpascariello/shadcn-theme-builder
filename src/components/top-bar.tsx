@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Sun, Moon, Save, ChevronDown, Trash2 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Sun, Moon, Save, ChevronDown, Trash2, CloudUpload, Cloud, Loader2, Wallet } from "lucide-react";
+import { appKit } from "@/lib/reown-config";
 import { useTheme } from "@/context/theme-context";
 import { useSavedThemes } from "@/hooks/use-saved-themes";
+import { useAlephSync } from "@/hooks/use-aleph-sync";
 import { presets } from "@/lib/presets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,16 +19,48 @@ import {
 export function TopBar() {
   const { activePreset, loadPreset, loadThemeConfig, getThemeConfig, previewMode, setPreviewMode } = useTheme();
   const { savedThemes, save, remove, exists } = useSavedThemes();
+  const { isConnected, address, isSyncing, remoteThemes, pushToAleph } = useAlephSync();
   const [presetOpen, setPresetOpen] = useState(false);
+  const [pushing, setPushing] = useState(false);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [confirmOverwrite, setConfirmOverwrite] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
+  const cloudOnly = useMemo(() => {
+    if (!remoteThemes) return [];
+    return remoteThemes.filter(
+      (r) => !savedThemes.some((l) => l.name === r.name),
+    );
+  }, [remoteThemes, savedThemes]);
+
+  // True when local themes differ from what's on the cloud
+  const hasUnpushedChanges = useMemo(() => {
+    if (savedThemes.length === 0) return false;
+    if (!remoteThemes) return true; // never pushed
+    if (savedThemes.length !== remoteThemes.length) return true;
+    return savedThemes.some(
+      (local) => !remoteThemes.some((remote) => remote.name === local.name),
+    );
+  }, [savedThemes, remoteThemes]);
+
   const activeLabel =
     presets.find((p) => p.name === activePreset)?.label
     ?? savedThemes.find((t) => t.name === activePreset)?.label
+    ?? cloudOnly.find((t) => t.name === activePreset)?.label
     ?? "Custom";
+
+  const handlePush = async () => {
+    if (savedThemes.length === 0) return;
+    setPushing(true);
+    try {
+      await pushToAleph(savedThemes);
+    } catch {
+      // error is surfaced via lastSyncError in the hook
+    } finally {
+      setPushing(false);
+    }
+  };
 
   const handleSave = () => {
     const trimmed = saveName.trim();
@@ -136,6 +170,38 @@ export function TopBar() {
                 ))}
               </>
             )}
+            {cloudOnly.length > 0 && (
+              <>
+                <div className="my-1 border-t border-border" />
+                <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Cloud Themes
+                </div>
+                {cloudOnly.map((theme) => (
+                  <button
+                    key={theme.name}
+                    onClick={() => {
+                      loadThemeConfig(theme);
+                      setPresetOpen(false);
+                    }}
+                    className={`flex items-center w-full px-3 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors ${
+                      activePreset === theme.name ? "bg-accent text-accent-foreground" : ""
+                    }`}
+                  >
+                    <Cloud className="h-3.5 w-3.5 mr-2 opacity-50 shrink-0" />
+                    {theme.label}
+                  </button>
+                ))}
+              </>
+            )}
+            {isSyncing && (
+              <>
+                <div className="my-1 border-t border-border" />
+                <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Loading cloud themes…
+                </div>
+              </>
+            )}
           </PopoverContent>
         </Popover>
 
@@ -173,6 +239,21 @@ export function TopBar() {
           </PopoverContent>
         </Popover>
 
+        {/* Push to Aleph */}
+        <Button
+          variant="outline"
+          size="icon"
+          title="Push saved themes to Aleph Cloud"
+          onClick={handlePush}
+          disabled={!isConnected || !hasUnpushedChanges || pushing}
+        >
+          {pushing ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <CloudUpload className="size-4" />
+          )}
+        </Button>
+
         {/* Light/dark toggle */}
         <Button
           variant="outline"
@@ -189,6 +270,21 @@ export function TopBar() {
         </Button>
 
         <ExportDialog />
+
+        {/* Wallet connect */}
+        <Button
+          variant="outline"
+          size={isConnected ? "default" : "icon"}
+          title={isConnected ? address : "Connect wallet"}
+          onClick={() => appKit.open()}
+        >
+          <Wallet className="size-4" />
+          {isConnected && address && (
+            <span className="text-xs font-mono">
+              {address.slice(0, 6)}…{address.slice(-4)}
+            </span>
+          )}
+        </Button>
       </div>
     </div>
   );

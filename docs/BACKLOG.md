@@ -48,6 +48,10 @@ Ideas and scope creep captured for later consideration.
 **Source:** User idea
 **Completed:** Save/load/delete custom themes via localStorage. Floppy disk icon button opens name input popover with overwrite confirmation. Saved themes appear in "My Themes" section of the preset dropdown with inline delete (two-click confirm). Also fixed: `loadedTheme` replaced with `loadedThemeConfig` (full ThemeConfig) so hue/lightness shifts and shadow reset work correctly with saved themes.
 
+### 2026-02-04 - Aleph Cloud sync with Reown wallet ✅
+**Source:** User idea, planned and implemented
+**Completed:** Save/load themes to Aleph.im aggregate messages via Reown AppKit wallet connection (ETH + SOL). Auto-pulls on connect, push button syncs local themes to cloud. Preset dropdown shows "Cloud Themes" section for remote-only themes. Push button disabled when local matches remote.
+
 ### 2026-02-03 - Global spacing slider ✅
 **Source:** User idea, brainstormed and designed
 **Completed:** Added `--spacing` slider (0.15–0.4rem) controlling Tailwind CSS 4's base spacing unit. Sits next to border radius. Included in export, undo/redo, and all presets. Per-component overrides (buttons, form fields) deferred — not exportable without brittle selector overrides.

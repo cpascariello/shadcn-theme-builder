@@ -131,6 +131,8 @@ Visual theme builder for shadcn/ui components with real-time preview.
 - **State:** React Context API
 - **Colors:** OKLCH color space
 - **Charts:** Recharts
+- **Wallet:** Reown AppKit (ETH + SOL)
+- **Cloud Storage:** Aleph.im aggregate messages
 
 ### Commands
 
@@ -164,6 +166,7 @@ src/
 - **Color shifts:** Hue (-180° to +180°) and lightness (-0.15 to +0.15) sliders in side panel, rotate/shift preset palette, skip destructive/achromatic colors, survive non-color edits
 - **Presets:** Bubblegum, Aleph Cloud, Retro (default), Default, Warm, Cool, Green, High Contrast — all include sidebar colors
 - **Save themes:** Save custom themes to localStorage with name, load from "My Themes" in preset dropdown, delete with two-click confirmation
+- **Cloud sync:** Push saved themes to Aleph.im via Reown wallet (ETH/SOL), auto-pull on connect, "Cloud Themes" section in dropdown for remote-only themes, push button disabled when in sync
 - **Live preview:** Dashboard with 20 components in masonry layout + sidebar icon rail, shadow tiers applied via CSS variables
 - **Undo/redo:** Debounced history stack (max 50), toolbar buttons + Cmd/Ctrl+Z keyboard shortcuts, preset loads reset history
 - **Export:** Full globals.css with colors, fonts, radius, letter spacing, shadow tiers (--shadow-2xs through --shadow-2xl), sidebar colors, and @theme inline block
