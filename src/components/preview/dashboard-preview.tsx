@@ -27,7 +27,8 @@ export function DashboardPreview() {
     <div className="flex flex-1 min-h-0 bg-background">
       <SidebarRail />
       <div className="flex-1 overflow-y-auto">
-      <div className="w-full p-6 space-y-6">
+      {/* pb-16 on mobile for the fixed "Edit Theme" bottom bar */}
+      <div className="w-full p-6 pb-20 md:pb-6 space-y-6">
         {/* Section 1: 4-column masonry layout */}
         <div className="columns-1 md:columns-2 lg:columns-4 gap-6 [&>*]:mb-6 [&>*]:break-inside-avoid">
           {/* Col 1 */}

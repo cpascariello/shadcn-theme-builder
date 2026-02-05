@@ -27,15 +27,19 @@ src/
 │   ├── layout.tsx         # Root layout with ThemeProvider
 │   └── globals.css        # Tailwind config + default theme
 ├── components/
-│   ├── ui/                # shadcn/ui components (button, card, etc.)
-│   ├── color-editor.tsx   # Left sidebar with all controls
+│   ├── ui/                # shadcn/ui components (button, card, drawer, dropdown-menu, etc.)
+│   ├── top-bar.tsx        # AppBar: header with save, cloud push, export, wallet (hamburger on mobile)
+│   ├── undo-redo-bar.tsx  # Toolbar: preset dropdown, light/dark toggle, undo/redo
+│   ├── preset-dropdown.tsx # Theme preset selector with saved/cloud themes
+│   ├── light-dark-toggle.tsx # Light/dark mode toggle button
+│   ├── color-editor.tsx   # Desktop sidebar wrapper (hidden on mobile)
+│   ├── color-editor-content.tsx # Shared editor content (search + collapsible sections)
+│   ├── mobile-editor-sheet.tsx # Mobile bottom sheet with ColorEditorContent
 │   ├── color-row.tsx      # Individual color picker row
 │   ├── font-picker.tsx    # Google Font dropdown
 │   ├── shadow-controls.tsx # Shadow presets + sliders
-│   ├── undo-redo-bar.tsx  # Undo/redo toolbar above preview
-│   ├── top-bar.tsx        # Header with preset selector, save, cloud push, wallet connect
 │   ├── wallet-provider.tsx # WagmiProvider + QueryClientProvider wrapper
-│   ├── export-dialog.tsx  # CSS export modal
+│   ├── export-dialog.tsx  # CSS export modal (supports controlled open prop)
 │   └── preview/
 │       ├── dashboard-preview.tsx    # Preview container (masonry layout)
 │       ├── quick-stats.tsx          # Metric cards
@@ -162,3 +166,10 @@ src/
 **Approach:** Reown AppKit provides wallet connection (ETH + SOL) via `createAppKit()` with `WagmiAdapter` and `SolanaAdapter`. `WalletProvider` wraps the app with `WagmiProvider` + `QueryClientProvider`. Aleph SDK reads/writes theme data as aggregate messages (key: `shadcn-theme-builder-themes`, channel: `shadcn-theme-builder`). Aggregate stores `{ themes: ThemeConfig[] }` — a single `themes` key with the full array as a clean snapshot. Reads are free (no signing), writes trigger a wallet signature popup. `useAlephSync()` hook auto-pulls on wallet connect and exposes `pushToAleph`/`pullFromAleph`/`deleteFromAleph`. Push merges local themes into existing cloud themes client-side before writing the full snapshot. Delete fetches current cloud state, filters out the target, and pushes back. After a successful push, local themes are cleared from localStorage and appear under "Cloud Themes". The preset dropdown shows three sections: built-in presets, "My Themes" (local), and "Cloud Themes" (remote-only, with delete). Push button shows a helpful tooltip when disabled.
 **Key files:** `src/lib/reown-config.ts`, `src/lib/aleph.ts`, `src/hooks/use-aleph-sync.ts`, `src/components/wallet-provider.tsx`, `src/components/top-bar.tsx`
 **Notes:** Dynamic imports for Aleph SDK and ethers5 keep the main bundle small. Chain detection uses CAIP address prefix (`eip155:` vs `solana:`). Solana provider needs wrapping into `{ publicKey, signMessage, connected, connect }` for Aleph SDK's `getAccountFromProvider()`. ethers5 is aliased (`ethers5@npm:ethers@^5.7.2`) to avoid v6 conflicts. Fetch handles both the primary `{ themes: [...] }` format and a legacy per-key format from an intermediate version, deduplicating by name.
+
+### Mobile Responsive Layout
+**Date:** 2026-02-05
+**Context:** Make the theme builder usable on mobile devices
+**Approach:** Two-tier responsive layout with extracted reusable components. Desktop (>=md): AppBar (save, push, export, wallet) + Toolbar (preset, light/dark, undo/redo) + sidebar ColorEditor + SidebarRail. Mobile (<md): AppBar with hamburger menu (DropdownMenu), Toolbar unchanged, hidden sidebar/rail, Vaul Drawer bottom sheet for editing. Components extracted for reuse: `PresetDropdown`, `LightDarkToggle`, `ColorEditorContent`. The drawer uses `showOverlay={false}` to keep the preview visible and `max-h-[50vh]` for half-screen height. Sections default to collapsed on mobile via `defaultCollapsed` prop.
+**Key files:** `src/components/top-bar.tsx`, `src/components/undo-redo-bar.tsx`, `src/components/preset-dropdown.tsx`, `src/components/light-dark-toggle.tsx`, `src/components/color-editor-content.tsx`, `src/components/mobile-editor-sheet.tsx`, `src/components/ui/drawer.tsx`
+**Notes:** ExportDialog accepts optional `open`/`onOpenChange` props for controlled usage from hamburger menu. DrawerContent extended with `showOverlay` prop. Bottom padding (`pb-20 md:pb-6`) on preview ensures content isn't hidden behind the fixed "Edit Theme" bar.

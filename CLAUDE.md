@@ -63,11 +63,17 @@ When the conversation drifts from the stated task:
 - When dev starts, create feature branch from main before any file edits
 - Branch naming: `feature/[plan-name]`
 
-**Before merging:** Update docs before squash merging to main.
+**Before merging:** Update ALL docs before squash merging to main.
 - `docs/ARCHITECTURE.md` — add/update patterns for any new architectural decisions, new files, or changed structure
 - `CLAUDE.md` — update the Current Features list if user-facing behavior changed
-- `docs/DECISIONS.md` — log any key decisions made during the feature
-- `docs/BACKLOG.md` — add any deferred ideas or scope drift items noted during development
+- `docs/DECISIONS.md` — log any key decisions made during the feature (user feedback, changed approaches, "let's do X instead")
+- `docs/BACKLOG.md` — move completed items to Completed section, add any deferred ideas
+
+**Checklist before merge:**
+1. ARCHITECTURE.md updated?
+2. CLAUDE.md features updated?
+3. DECISIONS.md has implementation decisions?
+4. BACKLOG.md item moved to Completed?
 
 **During development:** Track intent, not metrics.
 
@@ -170,3 +176,4 @@ src/
 - **Live preview:** Dashboard with 20 components in masonry layout + sidebar icon rail, shadow tiers applied via CSS variables
 - **Undo/redo:** Debounced history stack (max 50), toolbar buttons + Cmd/Ctrl+Z keyboard shortcuts, preset loads reset history
 - **Export:** Full globals.css with colors, fonts, radius, letter spacing, shadow tiers (--shadow-2xs through --shadow-2xl), sidebar colors, and @theme inline block
+- **Mobile responsive:** Hamburger menu for app actions, bottom sheet editor (Vaul drawer at 50vh, no overlay), sections collapsed by default on mobile, hidden sidebar rail, full-width preview

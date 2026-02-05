@@ -4,10 +4,11 @@ import { useTheme } from "@/context/theme-context";
 import { ThemeColors, FontConfig, ShadowConfig } from "@/lib/theme-types";
 import { getFontStack } from "@/lib/fonts";
 import { buildShadowTiers } from "@/lib/shadow-presets";
-import { TopBar } from "@/components/top-bar";
+import { AppBar } from "@/components/top-bar";
 import { ColorEditor } from "@/components/color-editor";
 import { DashboardPreview } from "@/components/preview/dashboard-preview";
-import { UndoRedoBar } from "@/components/undo-redo-bar";
+import { Toolbar } from "@/components/undo-redo-bar";
+import { MobileEditorSheet } from "@/components/mobile-editor-sheet";
 
 function buildCssVariables(
   colors: ThemeColors,
@@ -79,17 +80,20 @@ export default function Home() {
 
       {/* Fixed header */}
       <div className="flex-shrink-0">
-        <TopBar />
+        <AppBar />
       </div>
 
       {/* Main content - two independently scrollable panes */}
       <div className="flex flex-1 min-h-0">
         <ColorEditor />
         <div className="flex flex-col flex-1 min-h-0 min-w-0">
-          <UndoRedoBar />
+          <Toolbar />
           <DashboardPreview />
         </div>
       </div>
+
+      {/* Mobile bottom sheet for editing */}
+      <MobileEditorSheet />
     </div>
   );
 }

@@ -128,7 +128,12 @@ ${formatShadowVars(shadow, "dark", "  ")}
 `;
 }
 
-export function ExportDialog() {
+interface ExportDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
   const { light, dark, radius, spacing, letterSpacing, fonts, shadow } = useTheme();
   const [copied, setCopied] = useState(false);
 
@@ -140,14 +145,19 @@ export function ExportDialog() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // When externally controlled (open prop provided), don't render the trigger
+  const isControlled = open !== undefined;
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-3xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Export globals.css</DialogTitle>

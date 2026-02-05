@@ -18,6 +18,24 @@ Each entry includes:
 
 ---
 
+## Decision #23 - 2026-02-05
+**Context:** Mobile bottom sheet — sections open by default showed too much content
+**Decision:** All collapsible sections start collapsed on mobile, open on desktop
+**Rationale:** User feedback — collapsed sections give a better overview of all available options on the limited mobile screen. Added `defaultCollapsed` prop to `ColorEditorContent`.
+**Alternatives considered:** Keep all open (too much scrolling on mobile)
+
+## Decision #22 - 2026-02-05
+**Context:** Mobile bottom sheet — drawer was darkening the preview and opening too high
+**Decision:** Disable overlay (`showOverlay={false}`) and cap height at 50vh
+**Rationale:** User feedback — the preview should stay visible and interactive while editing. Half-screen gives enough editor space while keeping preview context. Added `showOverlay` prop to drawer component.
+**Alternatives considered:** Modal drawer with overlay (blocks preview interaction)
+
+## Decision #21 - 2026-02-05
+**Context:** Toolbar control ordering
+**Decision:** Order: Preset dropdown → Light/dark toggle → (spacer) → Undo → Redo
+**Rationale:** User preference — light/dark toggle next to preset selector makes sense as both affect the overall theme appearance. Undo/redo are editing actions, grouped on the right.
+**Alternatives considered:** Toggle on far right after undo/redo (original layout)
+
 ## Decision #20 - 2026-02-05
 **Context:** Mobile responsive redesign — where to put undo/redo on mobile
 **Decision:** Keep undo/redo in the sticky toolbar header, alongside preset selector and light/dark toggle

@@ -61,7 +61,7 @@ export function SidebarRail() {
 
   return (
     <div
-      className="flex-shrink-0 flex flex-col items-center py-3 w-14"
+      className="flex-shrink-0 hidden md:flex flex-col items-center py-3 w-14"
       style={{
         backgroundColor: "var(--sidebar)",
         borderRight: "1px solid var(--sidebar-border)",

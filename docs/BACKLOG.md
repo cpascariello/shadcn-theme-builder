@@ -15,11 +15,6 @@ Ideas and scope creep captured for later consideration.
 
 ## Open Items
 
-### 2026-02-05 - Mobile responsive layout
-**Source:** User request, brainstormed and planned
-**Description:** Make the theme builder fully usable on mobile. Phase 1A: regroup desktop bars (AppBar + Toolbar). Phase 1B: hamburger menu, Vaul bottom sheet for color editor, hide sidebar rail, responsive preview. Design doc: `docs/plans/2026-02-05-mobile-responsive-design.md`. Implementation plan: `docs/plans/2026-02-05-mobile-responsive-plan.md`.
-**Priority:** High
-
 ### 2026-01-30 - Import external themes by pasting CSS
 **Source:** User idea
 **Description:** Allow users to paste globals.css from other shadcn theme builders (e.g. tinte.dev, ui.shadcn.com) and have the builder parse the CSS variables into a live theme. Would need to extract OKLCH/hex color values, radius, fonts, shadows, etc. from `:root` and `.dark` blocks.
@@ -60,5 +55,9 @@ Ideas and scope creep captured for later consideration.
 ### 2026-02-03 - Global spacing slider ✅
 **Source:** User idea, brainstormed and designed
 **Completed:** Added `--spacing` slider (0.15–0.4rem) controlling Tailwind CSS 4's base spacing unit. Sits next to border radius. Included in export, undo/redo, and all presets. Per-component overrides (buttons, form fields) deferred — not exportable without brittle selector overrides.
+
+### 2026-02-05 - Mobile responsive layout ✅
+**Source:** User request, brainstormed and planned
+**Completed:** Reorganized desktop bars (AppBar for app actions, Toolbar for editing controls). Mobile: hamburger menu, Vaul bottom sheet editor at 50vh without overlay, sections collapsed by default, hidden sidebar rail, full-width preview. Extracted reusable components (PresetDropdown, LightDarkToggle, ColorEditorContent).
 
 </details>
