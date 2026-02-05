@@ -15,6 +15,11 @@ Ideas and scope creep captured for later consideration.
 
 ## Open Items
 
+### 2026-02-05 - Mobile responsive layout
+**Source:** User request, brainstormed and planned
+**Description:** Make the theme builder fully usable on mobile. Phase 1A: regroup desktop bars (AppBar + Toolbar). Phase 1B: hamburger menu, Vaul bottom sheet for color editor, hide sidebar rail, responsive preview. Design doc: `docs/plans/2026-02-05-mobile-responsive-design.md`. Implementation plan: `docs/plans/2026-02-05-mobile-responsive-plan.md`.
+**Priority:** High
+
 ### 2026-01-30 - Import external themes by pasting CSS
 **Source:** User idea
 **Description:** Allow users to paste globals.css from other shadcn theme builders (e.g. tinte.dev, ui.shadcn.com) and have the builder parse the CSS variables into a live theme. Would need to extract OKLCH/hex color values, radius, fonts, shadows, etc. from `:root` and `.dark` blocks.

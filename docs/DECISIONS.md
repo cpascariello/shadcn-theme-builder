@@ -18,6 +18,30 @@ Each entry includes:
 
 ---
 
+## Decision #20 - 2026-02-05
+**Context:** Mobile responsive redesign — where to put undo/redo on mobile
+**Decision:** Keep undo/redo in the sticky toolbar header, alongside preset selector and light/dark toggle
+**Rationale:** Always accessible without opening the bottom sheet. Adds slight clutter to the toolbar but undo/redo is used frequently enough to justify permanent visibility.
+**Alternatives considered:** In bottom sheet header (only visible when editing), in hamburger (too much friction), keyboard shortcuts only (not discoverable)
+
+## Decision #19 - 2026-02-05
+**Context:** Mobile responsive redesign — how to open the color editor on mobile
+**Decision:** Persistent bottom bar with "Edit Theme" that opens a Vaul Drawer (bottom sheet) to 50% viewport height
+**Rationale:** Half-screen sheet keeps the preview visible above so users get instant visual feedback while editing. Persistent bar is always discoverable. Vaul gives native-feeling drag-to-close behavior.
+**Alternatives considered:** Accordion inline above preview (pushes preview down, no live feedback), toggle panel (all-or-nothing, no partial view), FAB button (less discoverable)
+
+## Decision #18 - 2026-02-05
+**Context:** Mobile responsive redesign — header content on small screens
+**Decision:** Hamburger menu for app-level actions (save, push, export, wallet), keep theme selector + light/dark toggle visible
+**Rationale:** Theme selector and light/dark toggle directly affect the preview and are used constantly. Save, push, export, and wallet are session-level actions used less frequently — hamburger is fine.
+**Alternatives considered:** Show all buttons (doesn't fit), show nothing (no quick access to common actions)
+
+## Decision #17 - 2026-02-05
+**Context:** Desktop toolbar reorganization — grouping controls by relevance
+**Decision:** Split into AppBar (title, save, push, export, wallet) and Toolbar (preset selector, undo/redo, light/dark toggle). Same content on both desktop and mobile, different layouts.
+**Rationale:** Groups "affects the preview" controls together. The UndoRedoBar was wasted space with only two buttons. Same content per bar on all breakpoints avoids conditional rendering — only CSS layout changes. Simpler code.
+**Alternatives considered:** Mobile-only regrouping (requires breakpoint-conditional content, more complex), keep current layout (undo/redo bar underutilized, header crowded)
+
 ## Decision #16 - 2026-02-04
 **Context:** Aleph aggregate format for storing themes
 **Decision:** Single `themes` array key with full snapshot writes, after trying per-key format
